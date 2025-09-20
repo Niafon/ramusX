@@ -1,0 +1,31 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 88 88'>
+    <defs>
+        <linearGradient id='bg' x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stop-color='#c0c6ff' />
+            <stop offset='55%' stop-color='#9ea8ff' />
+            <stop offset='100%' stop-color='#4f52ff' />
+        </linearGradient>
+        <linearGradient id='shine' x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stop-color='#ffffff' stop-opacity='0.75' />
+            <stop offset='70%' stop-color='#ffffff' stop-opacity='0' />
+        </linearGradient>
+        <linearGradient id='edgeShadow' x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stop-color='#000000' stop-opacity='0.0' />
+            <stop offset='100%' stop-color='#3b3ebf' stop-opacity='0.35' />
+        </linearGradient>
+        <filter id='symbolShadow' x='-0.2' y='-0.2' width='1.4' height='1.4'>
+            <feDropShadow dx='0' dy='2' stdDeviation='2' flood-color='#001a3d' flood-opacity='0.35' />
+        </filter>
+    </defs>
+    <g>
+        <rect x='21.120' y='21.120' width='45.760' height='45.760' rx='15.840' fill='url(#bg)' />
+        <rect x='21.120' y='21.120' width='45.760' height='45.760' rx='15.840' fill='none' stroke='#d3d8ff' stroke-width='3.520' />
+        <rect x='21.120' y='21.120' width='45.760' height='45.760' rx='15.840' fill='none' stroke='#3b3ebf' stroke-width='2.640' opacity='0.25' />
+        <path d='M 22.880,22.880 H 66.880 Q 61.600,35.200 51.040,38.720 H 22.880 Z' fill='url(#shine)' />
+        <path d='M 22.880,54.560 H 66.880 V 66.880 H 22.880 Z' fill='url(#edgeShadow)' opacity='0.55' />
+    </g>
+    <g filter='url(#symbolShadow)'>
+        <path d='M 59.838,25.125 A 24.640,24.640 0 1 1 20.846,35.573 L 34.926,25.013 L 27.886,51.413 Z' fill='#ffffff'/>
+        <path d='M 28.162,25.125 A 24.640,24.640 0 1 0 67.154,35.573 L 53.074,25.013 L 60.114,51.413 Z' fill='#ffffff'/>
+    </g>
+</svg>

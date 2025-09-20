@@ -39,6 +39,7 @@ import com.ramussoft.gui.common.UniqueView;
 import com.ramussoft.gui.common.event.ActionListener;
 import com.ramussoft.gui.qualifier.Commands;
 import com.ramussoft.gui.qualifier.table.RowNode;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class ModelsView extends AbstractUniqueView implements UniqueView {
 
@@ -59,8 +60,7 @@ public class ModelsView extends AbstractUniqueView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "OpenFunction");
             this.putValue(
                     SMALL_ICON,
-                    new ImageIcon(getClass().getResource(
-                            "/com/ramussoft/gui/open.png")));
+                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/open.png"));
             this.putValue(
                     ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK
@@ -360,8 +360,7 @@ public class ModelsView extends AbstractUniqueView implements UniqueView {
 
                 {
                     putValue(ACTION_COMMAND_KEY, "CreateFunction");
-                    this.putValue(SMALL_ICON, new ImageIcon(getClass()
-                            .getResource("/images/create-diagram.png")));
+                    this.putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/images/create-diagram.png"));
                     this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                             KeyEvent.VK_ADD, KeyEvent.CTRL_MASK));
                     this.setEnabled(rules.canCreateQualifier());
@@ -396,8 +395,7 @@ public class ModelsView extends AbstractUniqueView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "DeleteModel");
             this.putValue(
                     SMALL_ICON,
-                    new ImageIcon(getClass().getResource(
-                            "/com/ramussoft/gui/table/delete.png")));
+                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/delete.png"));
             this.putValue(ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         }
@@ -423,8 +421,7 @@ public class ModelsView extends AbstractUniqueView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "ModelProperties");
             this.putValue(
                     SMALL_ICON,
-                    new ImageIcon(getClass().getResource(
-                            "/com/ramussoft/gui/preferencies.png")));
+                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/preferencies.png"));
             this.putValue(
                     ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK
@@ -463,8 +460,7 @@ public class ModelsView extends AbstractUniqueView implements UniqueView {
             this.putValue(ACTION_COMMAND_KEY, "CollapseAll");
             this.putValue(
                     SMALL_ICON,
-                    new ImageIcon(getClass().getResource(
-                            "/com/ramussoft/gui/table/collapse.png")));
+                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/collapse.png"));
             this.putValue(
                     ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK
@@ -489,8 +485,7 @@ public class ModelsView extends AbstractUniqueView implements UniqueView {
             this.putValue(ACTION_COMMAND_KEY, "ExpandAll");
             this.putValue(
                     SMALL_ICON,
-                    new ImageIcon(getClass().getResource(
-                            "/com/ramussoft/gui/table/expand.png")));
+                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/expand.png"));
             this.putValue(
                     ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_MASK

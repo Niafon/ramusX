@@ -1,0 +1,34 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 64 64'>
+    <defs>
+        <linearGradient id='bg' x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stop-color='#d0cbff' />
+            <stop offset='55%' stop-color='#b7afff' />
+            <stop offset='100%' stop-color='#5a51ff' />
+        </linearGradient>
+        <linearGradient id='shine' x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stop-color='#ffffff' stop-opacity='0.75' />
+            <stop offset='70%' stop-color='#ffffff' stop-opacity='0' />
+        </linearGradient>
+        <linearGradient id='edgeShadow' x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stop-color='#000000' stop-opacity='0.0' />
+            <stop offset='100%' stop-color='#443dbf' stop-opacity='0.35' />
+        </linearGradient>
+        <filter id='symbolShadow' x='-0.2' y='-0.2' width='1.4' height='1.4'>
+            <feDropShadow dx='0' dy='2' stdDeviation='2' flood-color='#001a3d' flood-opacity='0.35' />
+        </filter>
+    </defs>
+    <g>
+        <rect x='15.360' y='15.360' width='33.280' height='33.280' rx='11.520' fill='url(#bg)' />
+        <rect x='15.360' y='15.360' width='33.280' height='33.280' rx='11.520' fill='none' stroke='#dfdbff' stroke-width='2.560' />
+        <rect x='15.360' y='15.360' width='33.280' height='33.280' rx='11.520' fill='none' stroke='#443dbf' stroke-width='1.920' opacity='0.25' />
+        <path d='M 16.640,16.640 H 48.640 Q 44.800,25.600 37.120,28.160 H 16.640 Z' fill='url(#shine)' />
+        <path d='M 16.640,39.680 H 48.640 V 48.640 H 16.640 Z' fill='url(#edgeShadow)' opacity='0.55' />
+    </g>
+    <g filter='url(#symbolShadow)'>
+        <rect x="11.520" y="15.360" width="40.960" height="26.880" rx="10.240" ry="10.240" fill="#ffffff" fill-opacity="0.820" />
+        <polygon points="26.880,42.240 26.880,55.040 39.680,42.240" fill="#ffffff" fill-opacity="0.820" />
+        <circle cx="23.040" cy="26.880" r="3.200" fill="#ffffff" fill-opacity="0.650" />
+        <circle cx="32.000" cy="26.880" r="3.200" fill="#ffffff" fill-opacity="0.650" />
+        <circle cx="40.960" cy="26.880" r="3.200" fill="#ffffff" fill-opacity="0.650" />
+    </g>
+</svg>

@@ -314,17 +314,11 @@ public class MouseSelection extends Rectangle2D.Double implements VisualPanel {
     public void paint(Graphics2D g, MovingArea area) {
         for (Function function : functions) {
             FRectangle rectangle = function.getBounds();
-            g.drawRect(area.getIntOrdinate(rectangle.getX() - 2),
-                    area.getIntOrdinate(rectangle.getY() - 2),
-                    area.getIntOrdinate(rectangle.getWidth() + 4),
-                    area.getIntOrdinate(rectangle.getHeight() + 4));
+            area.paintGlassSelection(g, area.getBounds(rectangle), 1f);
         }
         for (MovingLabel label : labels) {
             FRectangle rectangle = label.boundsCopy;
-            g.drawRect(area.getIntOrdinate(rectangle.getX() - 2),
-                    area.getIntOrdinate(rectangle.getY() - 2),
-                    area.getIntOrdinate(rectangle.getWidth() + 4),
-                    area.getIntOrdinate(rectangle.getHeight() + 4));
+            area.paintGlassSelection(g, area.getBounds(rectangle), 0.85f);
         }
     }
 

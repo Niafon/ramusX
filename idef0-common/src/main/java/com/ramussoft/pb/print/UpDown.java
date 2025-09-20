@@ -6,6 +6,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class UpDown extends JPanel {
 
@@ -48,8 +49,7 @@ public class UpDown extends JPanel {
                 }
             });
             buttonUp.setMnemonic(KeyEvent.VK_UNDEFINED);
-            buttonUp.setIcon(new ImageIcon(getClass().getResource(
-                    "/images/smallUp.gif")));
+            buttonUp.setIcon(IconLoader.getIcon(getClass(), "/images/smallUp.png"));
             buttonUp.setFocusable(false);
         }
         return buttonUp;
@@ -68,8 +68,7 @@ public class UpDown extends JPanel {
                     onDown();
                 }
             });
-            buttonDown.setIcon(new ImageIcon(getClass().getResource(
-                    "/images/smallDown.gif")));
+            buttonDown.setIcon(IconLoader.getIcon(getClass(), "/images/smallDown.png"));
             buttonDown.setFocusable(false);
         }
         return buttonDown;

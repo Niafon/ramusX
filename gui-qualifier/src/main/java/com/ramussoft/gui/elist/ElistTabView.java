@@ -46,6 +46,7 @@ import com.ramussoft.gui.elist.ElistPanel.ElementInfo;
 import com.ramussoft.gui.qualifier.table.SelectType;
 import com.ramussoft.gui.qualifier.table.TreeTableNode;
 import com.ramussoft.gui.qualifier.table.event.SelectionEvent;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class ElistTabView extends AbstractView implements TabView {
 
@@ -235,8 +236,7 @@ public class ElistTabView extends AbstractView implements TabView {
             putValue(ACTION_COMMAND_KEY, "Action.ElementList.Revert");
             putValue(
                     SMALL_ICON,
-                    new ImageIcon(getClass().getResource(
-                            "/com/ramussoft/gui/revert.png")));
+                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/revert.png"));
             putValue(SELECTED_KEY, false);
         }
 

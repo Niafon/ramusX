@@ -2,9 +2,10 @@ package com.ramussoft.gui.common;
 
 import java.awt.BorderLayout;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
+
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public abstract class SplashScreen extends JWindow {
 
@@ -28,7 +29,7 @@ public abstract class SplashScreen extends JWindow {
     }
 
     protected JLabel getLabel() {
-        return new JLabel(new ImageIcon(getClass().getResource(getImageName())));
+        return new JLabel(IconLoader.getIcon(getClass(), getImageName()));
     }
 
     protected abstract String getImageName();

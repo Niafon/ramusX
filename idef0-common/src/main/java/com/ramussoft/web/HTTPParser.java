@@ -439,7 +439,7 @@ public class HTTPParser extends Servlet {
             printStartATeg("reportsq/index.html?num=" + num + "&check="
                     + row.getElement().getId());
             htmlStream.print(" <img border=0 src=" + fromLink
-                    + "check_all.gif>");
+                    + "check_all.png>");
             printEndATeg();
 
             htmlStream.print("</td>");
@@ -2090,10 +2090,10 @@ public class HTTPParser extends Servlet {
             } else if (location.equals("favicon.ico")) {
                 favicon.writeTo(stream);
                 printImage = true;
-            } else if (location.equals("check_all.gif")) {
+            } else if (location.equals("check_all.png")) {
                 response.setContentType("image/gif");
                 final InputStream is = getClass().getResourceAsStream(
-                        "/images/check_all.gif");
+                        "/images/check_all.png");
                 AbstractDataPlugin.copyStream(is, stream);
                 printImage = true;
             } else if (location.endsWith("file_getter.html")) {

@@ -28,6 +28,7 @@ import com.ramussoft.gui.common.GUIFramework;
 import com.ramussoft.gui.common.UniqueView;
 import com.ramussoft.gui.common.event.ActionListener;
 import com.ramussoft.gui.qualifier.Commands;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class JSModulesEditor extends AbstractUniqueView implements UniqueView,
         Constants {
@@ -211,8 +212,7 @@ public class JSModulesEditor extends AbstractUniqueView implements UniqueView,
 
         public AddModuleAction() {
             putValue(ACTION_COMMAND_KEY, "Action.AddModule");
-            putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource(
-                    "/com/ramussoft/gui/table/add.png")));
+            putValue(Action.SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/add.png"));
         }
 
         @Override
@@ -235,8 +235,7 @@ public class JSModulesEditor extends AbstractUniqueView implements UniqueView,
 
         public RemoveModuleAction() {
             putValue(ACTION_COMMAND_KEY, "Action.RemoveModule");
-            putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource(
-                    "/com/ramussoft/gui/table/delete.png")));
+            putValue(Action.SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/delete.png"));
             setEnabled(false);
         }
 
@@ -267,8 +266,7 @@ public class JSModulesEditor extends AbstractUniqueView implements UniqueView,
 
         public OpenModuleAction() {
             putValue(ACTION_COMMAND_KEY, "Action.OpenModule");
-            putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource(
-                    "/com/ramussoft/gui/open.png")));
+            putValue(Action.SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/open.png"));
             setEnabled(false);
         }
 

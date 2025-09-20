@@ -15,6 +15,7 @@ import com.ramussoft.common.event.BranchAdapter;
 import com.ramussoft.common.event.BranchEvent;
 import com.ramussoft.common.journal.Journaled;
 import com.ramussoft.common.journal.event.JournalListener;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class UndoRedoPlugin extends AbstractViewPlugin {
 
@@ -85,7 +86,7 @@ public class UndoRedoPlugin extends AbstractViewPlugin {
     }
 
     private ImageIcon getIcon(String resourceName) {
-        return new ImageIcon(getClass().getResource(resourceName));
+        return IconLoader.getIcon(getClass(), resourceName);
     }
 
     protected void updateUndoRedo() {

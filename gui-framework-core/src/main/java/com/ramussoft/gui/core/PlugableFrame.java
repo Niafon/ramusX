@@ -21,6 +21,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+import com.formdev.flatlaf.FlatClientProperties;
+
 import com.ramussoft.gui.common.ActionDescriptor;
 import com.ramussoft.gui.common.ActionLevel;
 import com.ramussoft.gui.common.GlobalResourcesManager;
@@ -28,6 +30,9 @@ import com.ramussoft.gui.common.StringGetter;
 import com.ramussoft.gui.common.ViewPlugin;
 
 import static com.ramussoft.gui.common.GUIFramework.*;
+
+import com.ramussoft.gui.core.laf.LiquidGlassBackgroundPanel;
+import com.ramussoft.gui.core.laf.LiquidGlassToolBar;
 
 public class PlugableFrame extends JFrame {
 
@@ -310,11 +315,15 @@ public class PlugableFrame extends JFrame {
 
     @SuppressWarnings("unchecked")
     private void createToolBars() {
-        toolBarsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        LiquidGlassBackgroundPanel glassPanel = new LiquidGlassBackgroundPanel();
+        glassPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 8));
+        glassPanel.putClientProperty(FlatClientProperties.STYLE,
+                "background:null; borderWidth:0; focusWidth:0; innerFocusWidth:0;");
+        toolBarsPanel = glassPanel;
         for (Object object : toolBarActions) {
             Entry<String, Object> entry = (Entry<String, Object>) object;
             List<Action> list = (List) entry.getValue();
-            JToolBar toolBar = new JToolBar();
+            JToolBar toolBar = new LiquidGlassToolBar();
             for (Action a : list) {
                 if (a == null)
                     toolBar.addSeparator();
@@ -339,6 +348,8 @@ public class PlugableFrame extends JFrame {
                         }
                     }
                     button.setFocusable(false);
+                    button.putClientProperty(FlatClientProperties.STYLE,
+                            "arc:18; focusWidth:1; innerFocusWidth:0; borderWidth:0; background:null;");
                 }
             }
             toolBars.put(entry.getKey(), toolBar);
@@ -346,7 +357,25 @@ public class PlugableFrame extends JFrame {
         }
         for (ViewPlugin p : plugins) {
             for (JToolBar bar : p.getToolBars()) {
+                configureExternalToolBar(bar);
                 toolBarsPanel.add(bar);
+            }
+        }
+    }
+
+    private void configureExternalToolBar(JToolBar toolBar) {
+        if (!(toolBar instanceof LiquidGlassToolBar)) {
+            toolBar.setOpaque(false);
+            toolBar.putClientProperty(FlatClientProperties.STYLE,
+                    "background:null; borderWidth:0; focusWidth:0; innerFocusWidth:0;");
+            toolBar.setBorder(new javax.swing.border.EmptyBorder(6, 10, 6, 10));
+        }
+        for (java.awt.Component component : toolBar.getComponents()) {
+            if (component instanceof AbstractButton) {
+                ((AbstractButton) component).setFocusable(false);
+                ((AbstractButton) component).putClientProperty(
+                        FlatClientProperties.STYLE,
+                        "arc:18; focusWidth:1; innerFocusWidth:0; borderWidth:0; background:null;");
             }
         }
     }

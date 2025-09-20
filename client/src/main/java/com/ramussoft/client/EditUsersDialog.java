@@ -26,6 +26,7 @@ import com.ramussoft.gui.common.prefrence.Options;
 import com.ramussoft.net.common.Group;
 import com.ramussoft.net.common.User;
 import com.ramussoft.net.common.UserFactory;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class EditUsersDialog extends BaseDialog {
 
@@ -296,8 +297,7 @@ public class EditUsersDialog extends BaseDialog {
         editUser = new AbstractAction() {
             {
                 putValue(SHORT_DESCRIPTION, plugin.getString("Action.EditUser"));
-                putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
-                        "/com/ramussoft/client/edit_user.png")));
+                putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/client/edit_user.png"));
             }
 
             /**
@@ -323,8 +323,7 @@ public class EditUsersDialog extends BaseDialog {
             {
                 putValue(SHORT_DESCRIPTION, plugin
                         .getString("Action.CreateUser"));
-                putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
-                        "/com/ramussoft/client/add_user.png")));
+                putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/client/add_user.png"));
             }
 
             /**
@@ -382,8 +381,7 @@ public class EditUsersDialog extends BaseDialog {
             {
                 putValue(SHORT_DESCRIPTION, plugin
                         .getString("Action.CreateGroup"));
-                putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
-                        "/com/ramussoft/client/add_group.png")));
+                putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/client/add_group.png"));
             }
 
 
@@ -421,8 +419,7 @@ public class EditUsersDialog extends BaseDialog {
             {
                 putValue(SHORT_DESCRIPTION, plugin
                         .getString("Action.DeleteGroup"));
-                putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
-                        "/com/ramussoft/client/delete_group.png")));
+                putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/client/delete_group.png"));
             }
 
 
@@ -447,8 +444,7 @@ public class EditUsersDialog extends BaseDialog {
             {
                 putValue(SHORT_DESCRIPTION, plugin
                         .getString("Action.DeleteUser"));
-                putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
-                        "/com/ramussoft/client/delete_user.png")));
+                putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/client/delete_user.png"));
             }
 
 

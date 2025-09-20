@@ -57,6 +57,8 @@ import com.ramussoft.gui.common.prefrence.Options;
 import com.ramussoft.gui.core.GUIPluginFactory;
 import com.ramussoft.gui.core.simple.SimleGUIPluginFactory;
 import com.ramussoft.gui.qualifier.QualifierPluginSuit;
+import com.formdev.flatlaf.FlatLaf;
+import com.ramussoft.gui.core.laf.IOS26LookAndFeel;
 
 public class Runner implements Commands {
 
@@ -159,6 +161,7 @@ public class Runner implements Commands {
 
             try {
                 UIManager.put("swing.boldMetal", Boolean.FALSE);
+                IOS26LookAndFeel.register();
                 String lookAndFeel = Options.getString("LookAndFeel");
 
                 String lang = Options.getString("LANG");
@@ -171,16 +174,13 @@ public class Runner implements Commands {
                     }
                 }
 
-                if (lookAndFeel != null)
+                if (lookAndFeel == null || lookAndFeel.trim().length() == 0) {
+                    FlatLaf.setup(new IOS26LookAndFeel());
+                    lookAndFeel = IOS26LookAndFeel.class.getName();
+                    Options.setString("LookAndFeel", lookAndFeel);
+                    Options.save();
+                } else {
                     UIManager.setLookAndFeel(lookAndFeel);
-                else {
-                    if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
-                            .equals(UIManager.getSystemLookAndFeelClassName()))
-                        UIManager.setLookAndFeel(UIManager
-                                .getCrossPlatformLookAndFeelClassName());
-                    else
-                        UIManager.setLookAndFeel(UIManager
-                                .getSystemLookAndFeelClassName());
                 }
             } catch (Exception e1) {
                 e1.printStackTrace();

@@ -14,6 +14,7 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.ramussoft.report.ReportResourceManager;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class PreviewView extends SubView {
 
@@ -35,8 +36,7 @@ public class PreviewView extends SubView {
 
         {
             putValue(ACTION_COMMAND_KEY, "Refresh");
-            putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
-                    "/com/ramussoft/gui/refresh.png")));
+            putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/refresh.png"));
         }
 
         @Override

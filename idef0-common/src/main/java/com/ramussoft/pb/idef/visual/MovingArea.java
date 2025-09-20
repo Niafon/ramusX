@@ -7,12 +7,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.LinearGradientPaint;
+import java.awt.RadialGradientPaint;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
@@ -24,10 +28,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -39,6 +48,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.TooManyListenersException;
 import java.util.Vector;
@@ -52,8 +63,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import com.dsoft.pb.idef.ResourceLoader;
 import com.dsoft.pb.types.FRectangle;
@@ -143,6 +158,20 @@ public class MovingArea extends JPanel {
      */
 
     private boolean printing = false;
+
+    private GlassPalette glassPalette = GlassPalette.fromOptions();
+    private Color accentColor = resolveAccentColor();
+    private final Object glassCacheLock = new Object();
+    private BufferedImage cachedGlassBackground;
+    private Dimension cachedGlassSize = new Dimension(0, 0);
+    private double cachedGlassZoom = -1d;
+    private boolean cachedGlassShowNet;
+    private Color cachedAccentColor;
+    private GlassPalette cachedPalette;
+    private float cachedBlurRadius = -1f;
+    private final float glassBlurRadius = 14f;
+    private PropertyChangeListener accentChangeListener;
+    private boolean accentListenerRegistered;
 
     private static final ExecutorService bkPainter = Executors
             .newSingleThreadExecutor();
@@ -394,6 +423,471 @@ public class MovingArea extends JPanel {
             }
         }
     }
+
+    private BufferedImage getGlassBackgroundImage() {
+        int width = Math.max(1, getWidth());
+        int height = Math.max(1, getHeight());
+        synchronized (glassCacheLock) {
+            if (cachedGlassBackground != null
+                    && cachedGlassSize.width == width
+                    && cachedGlassSize.height == height
+                    && Double.doubleToLongBits(cachedGlassZoom) == Double.doubleToLongBits(zoom)
+                    && cachedGlassShowNet == showNet
+                    && Objects.equals(cachedAccentColor, accentColor)
+                    && Objects.equals(cachedPalette, glassPalette)
+                    && Float.floatToIntBits(cachedBlurRadius) == Float
+                    .floatToIntBits(glassBlurRadius)) {
+                return cachedGlassBackground;
+            }
+        }
+        BufferedImage background = createGlassBackground(width, height);
+        synchronized (glassCacheLock) {
+            cachedGlassBackground = background;
+            cachedGlassSize.setSize(width, height);
+            cachedGlassZoom = zoom;
+            cachedGlassShowNet = showNet;
+            cachedAccentColor = accentColor;
+            cachedPalette = glassPalette;
+            cachedBlurRadius = glassBlurRadius;
+            return cachedGlassBackground;
+        }
+    }
+
+    private BufferedImage createGlassBackground(int width, int height) {
+        BufferedImage gradient = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gradientGraphics = gradient.createGraphics();
+        try {
+            applyQualityHints(gradientGraphics);
+            paintGlassGradient(gradientGraphics, width, height);
+        } finally {
+            gradientGraphics.dispose();
+        }
+        BufferedImage blurred = applyGaussianBlur(gradient, glassBlurRadius);
+        gradient.flush();
+        Graphics2D overlayGraphics = blurred.createGraphics();
+        try {
+            applyQualityHints(overlayGraphics);
+            paintGlassOverlay(overlayGraphics, width, height);
+        } finally {
+            overlayGraphics.dispose();
+        }
+        return blurred;
+    }
+
+    private void paintGlassGradient(Graphics2D g, int width, int height) {
+        Color background = glassPalette.getBackground();
+        Color highlight = glassPalette.getHighlight();
+        Color accent = accentColor != null ? accentColor : highlight;
+
+        g.setColor(background);
+        g.fillRect(0, 0, width, height);
+
+        Point2D center = new Point2D.Double(width * 0.32, height * 0.24);
+        float radius = (float) (Math.max(width, height) * 0.85f);
+        RadialGradientPaint radial = new RadialGradientPaint(center, radius,
+                new float[]{0f, 0.55f, 1f}, new Color[]{
+                withAlpha(mix(highlight, accent, 0.25f), 220),
+                withAlpha(mix(background, accent, 0.35f), 120),
+                withAlpha(background, 0)});
+        g.setComposite(AlphaComposite.SrcOver.derive(0.92f));
+        g.setPaint(radial);
+        g.fillRect(0, 0, width, height);
+
+        LinearGradientPaint vertical = new LinearGradientPaint(
+                new Point2D.Double(0, 0), new Point2D.Double(0, height),
+                new float[]{0f, 0.55f, 1f}, new Color[]{
+                withAlpha(mix(highlight, Color.WHITE, 0.6f), 190),
+                withAlpha(mix(background, accent, 0.25f), 130),
+                withAlpha(background, 255)});
+        g.setComposite(AlphaComposite.SrcOver.derive(0.85f));
+        g.setPaint(vertical);
+        g.fillRect(0, 0, width, height);
+
+        Point2D secondaryCenter = new Point2D.Double(width * 0.78, height * 0.82);
+        float secondaryRadius = (float) (Math.max(width, height) * 0.72f);
+        RadialGradientPaint secondary = new RadialGradientPaint(secondaryCenter,
+                secondaryRadius, new float[]{0f, 0.6f, 1f}, new Color[]{
+                withAlpha(mix(background, accent, 0.4f), 110),
+                withAlpha(background, 50),
+                withAlpha(background, 0)});
+        g.setComposite(AlphaComposite.SrcOver.derive(0.75f));
+        g.setPaint(secondary);
+        g.fillRect(0, 0, width, height);
+        g.setComposite(AlphaComposite.SrcOver);
+    }
+
+    private void paintGlassOverlay(Graphics2D g, int width, int height) {
+        paintGlassGrid(g, width, height);
+        paintSparkles(g, width, height);
+    }
+
+    private void paintGlassGrid(Graphics2D g, int width, int height) {
+        double minorSpacing = Math.max(12d, getIDoubleOrdinate(NET_LENGTH * 4));
+        double majorSpacing = Math.max(minorSpacing * 2.5,
+                getIDoubleOrdinate(NET_LENGTH * 12));
+
+        Stroke oldStroke = g.getStroke();
+        Composite oldComposite = g.getComposite();
+
+        g.setStroke(new BasicStroke(1f, BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_ROUND));
+        g.setComposite(AlphaComposite.SrcOver.derive(showNet ? 0.22f : 0.12f));
+        g.setColor(withAlpha(glassPalette.getGridSecondary(),
+                showNet ? 200 : 110));
+        for (double x = minorSpacing; x < width; x += minorSpacing) {
+            double px = Math.round(x);
+            g.draw(new Line2D.Double(px, 0, px, height));
+        }
+        for (double y = minorSpacing; y < height; y += minorSpacing) {
+            double py = Math.round(y);
+            g.draw(new Line2D.Double(0, py, width, py));
+        }
+
+        g.setComposite(AlphaComposite.SrcOver.derive(showNet ? 0.3f : 0.16f));
+        g.setColor(withAlpha(glassPalette.getGridPrimary(),
+                showNet ? 220 : 130));
+        if (majorSpacing > minorSpacing + 2) {
+            for (double x = majorSpacing; x < width; x += majorSpacing) {
+                double px = Math.round(x);
+                g.draw(new Line2D.Double(px, 0, px, height));
+            }
+            for (double y = majorSpacing; y < height; y += majorSpacing) {
+                double py = Math.round(y);
+                g.draw(new Line2D.Double(0, py, width, py));
+            }
+        }
+
+        g.setComposite(oldComposite);
+        g.setStroke(oldStroke);
+    }
+
+    private void paintSparkles(Graphics2D g, int width, int height) {
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+        Random random = new Random(width * 37L + height * 53L);
+        int count = Math.max(8, (width * height) / 45000);
+        for (int i = 0; i < count; i++) {
+            double size = 8 + random.nextDouble() * 18;
+            double x = random.nextDouble() * width;
+            double y = random.nextDouble() * height;
+            paintSparkle(g, x, y, size);
+        }
+    }
+
+    private void paintSparkle(Graphics2D g, double x, double y, double size) {
+        double radius = size / 2.0;
+        Point2D center = new Point2D.Double(x, y);
+        Paint oldPaint = g.getPaint();
+        Composite oldComposite = g.getComposite();
+        Stroke oldStroke = g.getStroke();
+        try {
+            RadialGradientPaint glow = new RadialGradientPaint(center,
+                    (float) (radius * 1.6), new float[]{0f, 0.45f, 1f},
+                    new Color[]{withAlpha(Color.WHITE, 220),
+                            withAlpha(glassPalette.getSparkle(), 150),
+                            withAlpha(glassPalette.getSparkle(), 0)});
+            g.setComposite(AlphaComposite.SrcOver.derive(0.55f));
+            g.setPaint(glow);
+            double diameter = radius * 3.2;
+            g.fill(new Ellipse2D.Double(center.getX() - radius * 1.6,
+                    center.getY() - radius * 1.6, diameter, diameter));
+
+            g.setComposite(AlphaComposite.SrcOver.derive(0.35f));
+            g.setStroke(new BasicStroke(1.2f, BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_ROUND));
+            LinearGradientPaint horizontal = new LinearGradientPaint(
+                    new Point2D.Double(x - radius, y),
+                    new Point2D.Double(x + radius, y),
+                    new float[]{0f, 0.5f, 1f}, new Color[]{
+                    withAlpha(glassPalette.getSparkle(), 0),
+                    withAlpha(Color.WHITE, 180),
+                    withAlpha(glassPalette.getSparkle(), 0)});
+            g.setPaint(horizontal);
+            g.draw(new Line2D.Double(x - radius, y, x + radius, y));
+
+            LinearGradientPaint vertical = new LinearGradientPaint(
+                    new Point2D.Double(x, y - radius),
+                    new Point2D.Double(x, y + radius),
+                    new float[]{0f, 0.5f, 1f}, new Color[]{
+                    withAlpha(glassPalette.getSparkle(), 0),
+                    withAlpha(Color.WHITE, 160),
+                    withAlpha(glassPalette.getSparkle(), 0)});
+            g.setPaint(vertical);
+            g.draw(new Line2D.Double(x, y - radius, x, y + radius));
+        } finally {
+            g.setStroke(oldStroke);
+            g.setComposite(oldComposite);
+            g.setPaint(oldPaint);
+        }
+    }
+
+    private BufferedImage applyGaussianBlur(BufferedImage image, float radius) {
+        if (radius <= 0f) {
+            return image;
+        }
+        float[] kernelData = createGaussianKernel(radius);
+        ConvolveOp horizontal = new ConvolveOp(
+                new Kernel(kernelData.length, 1, kernelData),
+                ConvolveOp.EDGE_NO_OP, null);
+        ConvolveOp vertical = new ConvolveOp(
+                new Kernel(1, kernelData.length, kernelData),
+                ConvolveOp.EDGE_NO_OP, null);
+        BufferedImage temp = new BufferedImage(image.getWidth(), image.getHeight(),
+                BufferedImage.TYPE_INT_ARGB);
+        horizontal.filter(image, temp);
+        BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(),
+                BufferedImage.TYPE_INT_ARGB);
+        vertical.filter(temp, result);
+        return result;
+    }
+
+    private float[] createGaussianKernel(float radius) {
+        int r = Math.max(1, (int) Math.ceil(radius));
+        int size = r * 2 + 1;
+        float sigma = Math.max(0.1f, radius / 3f);
+        float[] data = new float[size];
+        float sum = 0f;
+        for (int i = 0; i < size; i++) {
+            int distance = i - r;
+            float value = (float) Math.exp(-(distance * distance)
+                    / (2f * sigma * sigma));
+            data[i] = value;
+            sum += value;
+        }
+        if (sum == 0f) {
+            sum = 1f;
+        }
+        for (int i = 0; i < size; i++) {
+            data[i] /= sum;
+        }
+        return data;
+    }
+
+    private void applyQualityHints(Graphics2D g) {
+        if (DISABLE_RENDERING_HINTS || isPrinting()) {
+            return;
+        }
+        g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+                RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+                RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+                RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
+                RenderingHints.VALUE_STROKE_NORMALIZE);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    }
+
+    void paintGlassSelection(Graphics2D g, FRectangle bounds, float intensity) {
+        if (bounds == null) {
+            return;
+        }
+        paintGlassSelection(g, getBounds(bounds), intensity);
+    }
+
+    void paintGlassSelection(Graphics2D g, Rectangle2D bounds, float intensity) {
+        if (bounds == null || bounds.getWidth() <= 0
+                || bounds.getHeight() <= 0 || intensity <= 0f) {
+            return;
+        }
+        paintGlassGlow(g, bounds, intensity);
+        paintGlassOutline(g, bounds, intensity);
+    }
+
+    private void paintGlassGlow(Graphics2D g, Rectangle2D bounds, float intensity) {
+        double maxSize = Math.max(bounds.getWidth(), bounds.getHeight());
+        double padding = Math.max(14d, maxSize * 0.28d);
+        double radius = (maxSize + padding) / 2d;
+        Point2D center = new Point2D.Double(bounds.getCenterX(),
+                bounds.getCenterY());
+        float[] dist = new float[]{0f, 0.55f, 1f};
+        Color highlight = glassPalette.getHighlight();
+        Color accent = accentColor != null ? accentColor : highlight;
+        Color start = withAlpha(mix(highlight, accent, 0.45f),
+                Math.min(255, (int) (215 * intensity)));
+        Color middle = withAlpha(mix(accent, glassPalette.getBackground(), 0.35f),
+                Math.min(255, (int) (130 * intensity)));
+        Color end = withAlpha(glassPalette.getBackground(), 0);
+        RadialGradientPaint paint = new RadialGradientPaint(center,
+                (float) (radius * 1.55f), dist, new Color[]{start, middle, end});
+        Paint oldPaint = g.getPaint();
+        Composite oldComposite = g.getComposite();
+        g.setComposite(AlphaComposite.SrcOver.derive(Math.min(0.92f,
+                0.55f + intensity * 0.35f)));
+        g.setPaint(paint);
+        double diameter = radius * 3.1;
+        g.fill(new Ellipse2D.Double(center.getX() - radius * 1.55,
+                center.getY() - radius * 1.55, diameter, diameter));
+        g.setPaint(oldPaint);
+        g.setComposite(oldComposite);
+    }
+
+    private void paintGlassOutline(Graphics2D g, Rectangle2D bounds, float intensity) {
+        double arc = Math.max(18d, Math.min(64d,
+                Math.max(bounds.getWidth(), bounds.getHeight()) * 0.32d));
+        RoundRectangle2D outline = new RoundRectangle2D.Double(
+                bounds.getX() - 1.6, bounds.getY() - 1.6,
+                bounds.getWidth() + 3.2, bounds.getHeight() + 3.2, arc, arc);
+        Stroke oldStroke = g.getStroke();
+        Paint oldPaint = g.getPaint();
+        Composite oldComposite = g.getComposite();
+
+        g.setStroke(new BasicStroke(2.1f, BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_ROUND));
+        g.setComposite(AlphaComposite.SrcOver.derive(Math.min(0.75f,
+                0.4f + intensity * 0.45f)));
+        g.setPaint(new LinearGradientPaint(
+                new Point2D.Double(outline.getX(), outline.getY()),
+                new Point2D.Double(outline.getX(),
+                        outline.getY() + outline.getHeight()),
+                new float[]{0f, 0.5f, 1f}, new Color[]{
+                withAlpha(Color.WHITE, (int) (205 * intensity)),
+                withAlpha(mix(accentColor, glassPalette.getHighlight(), 0.5f),
+                        (int) (130 * intensity)),
+                withAlpha(accentColor, (int) (90 * intensity))}));
+        g.draw(outline);
+
+        RoundRectangle2D inner = new RoundRectangle2D.Double(bounds.getX(),
+                bounds.getY(), bounds.getWidth(), bounds.getHeight(),
+                Math.max(arc - 10, 12d), Math.max(arc - 10, 12d));
+        g.setComposite(AlphaComposite.SrcOver.derive(0.22f * intensity));
+        g.setPaint(new LinearGradientPaint(
+                new Point2D.Double(inner.getX(), inner.getY()),
+                new Point2D.Double(inner.getX(),
+                        inner.getY() + inner.getHeight()),
+                new float[]{0f, 0.45f, 1f}, new Color[]{
+                withAlpha(Color.WHITE, (int) (160 * intensity)),
+                withAlpha(glassPalette.getHighlight(), (int) (95 * intensity)),
+                withAlpha(Color.BLACK, 0)}));
+        g.fill(inner);
+
+        g.setComposite(oldComposite);
+        g.setStroke(oldStroke);
+        g.setPaint(oldPaint);
+    }
+
+    private Color mix(Color base, Color blend, float ratio) {
+        if (base == null) {
+            return blend;
+        }
+        if (blend == null) {
+            return base;
+        }
+        ratio = Math.max(0f, Math.min(1f, ratio));
+        float inv = 1f - ratio;
+        int r = Math.round(base.getRed() * inv + blend.getRed() * ratio);
+        int gVal = Math.round(base.getGreen() * inv + blend.getGreen() * ratio);
+        int b = Math.round(base.getBlue() * inv + blend.getBlue() * ratio);
+        int a = Math.round(base.getAlpha() * inv + blend.getAlpha() * ratio);
+        return new Color(clamp(r), clamp(gVal), clamp(b), clamp(a));
+    }
+
+    private int clamp(int value) {
+        return Math.max(0, Math.min(255, value));
+    }
+
+    private Color withAlpha(Color color, int alpha) {
+        if (color == null) {
+            return new Color(0, 0, 0, clamp(alpha));
+        }
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(),
+                clamp(alpha));
+    }
+
+    private void invalidateGlassCache() {
+        synchronized (glassCacheLock) {
+            cachedGlassBackground = null;
+            cachedGlassSize.setSize(-1, -1);
+            cachedGlassZoom = -1d;
+            cachedGlassShowNet = showNet;
+            cachedAccentColor = null;
+            cachedPalette = null;
+            cachedBlurRadius = -1f;
+        }
+        synchronized (backgroundPaintlock) {
+            bImage = null;
+        }
+        repaintAsync();
+    }
+
+    private Color resolveAccentColor() {
+        Color accent = UIManager.getColor("Component.accentColor");
+        if (accent == null) {
+            accent = UIManager.getColor("Component.focusColor");
+        }
+        if (accent == null) {
+            accent = UIManager.getColor("Button.default.background");
+        }
+        if (accent == null && glassPalette != null) {
+            accent = glassPalette.getHighlight();
+        }
+        if (accent == null) {
+            accent = new Color(78, 119, 255);
+        }
+        return accent;
+    }
+
+    private void installAccentListener() {
+        if (accentListenerRegistered) {
+            return;
+        }
+        if (accentChangeListener == null) {
+            accentChangeListener = new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    String property = evt != null ? evt.getPropertyName() : null;
+                    if (property == null || property.toLowerCase().contains("accent")
+                            || property.toLowerCase().contains("focus")
+                            || "lookandfeel".equalsIgnoreCase(property)) {
+                        Color newAccent = resolveAccentColor();
+                        if (!Objects.equals(newAccent, accentColor)) {
+                            accentColor = newAccent;
+                            invalidateGlassCache();
+                        }
+                    }
+                }
+            };
+        }
+        UIManager.addPropertyChangeListener(accentChangeListener);
+        try {
+            UIManager.getDefaults().addPropertyChangeListener(accentChangeListener);
+        } catch (UnsupportedOperationException ignored) {
+        }
+        accentListenerRegistered = true;
+        accentColor = resolveAccentColor();
+    }
+
+    private void uninstallAccentListener() {
+        if (!accentListenerRegistered || accentChangeListener == null) {
+            return;
+        }
+        UIManager.removePropertyChangeListener(accentChangeListener);
+        try {
+            UIManager.getDefaults().removePropertyChangeListener(accentChangeListener);
+        } catch (UnsupportedOperationException ignored) {
+        }
+        accentListenerRegistered = false;
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        installAccentListener();
+    }
+
+    @Override
+    public void removeNotify() {
+        uninstallAccentListener();
+        super.removeNotify();
+    }
+
 
     private static boolean getDefaultRenderingHintsDisability() {
         String vmName = System.getProperty("java.vm.name");
@@ -696,6 +1190,17 @@ public class MovingArea extends JPanel {
     public void setDataPlugin(final DataPlugin dataPlugin) {
         this.dataPlugin = dataPlugin;
         refactor = new SectorRefactor(this);
+    }
+
+    public void setGlassPalette(GlassPalette palette) {
+        if (palette == null) {
+            return;
+        }
+        if (!palette.equals(this.glassPalette)) {
+            this.glassPalette = palette;
+            accentColor = resolveAccentColor();
+            invalidateGlassCache();
+        }
     }
 
     public MovingArea(DataPlugin dataPlugin, IDEFPanel panel) {
@@ -2371,10 +2876,6 @@ public class MovingArea extends JPanel {
 
     int oldW = -1;
     int oldH = -1;
-
-    private AlphaComposite a = AlphaComposite.getInstance(
-            AlphaComposite.SRC_OVER, 0.5f);
-
     @Override
     public void paint(final Graphics gr) {
         synchronized (paintLock) {
@@ -2392,7 +2893,7 @@ public class MovingArea extends JPanel {
         boolean initRepaint = false;
         synchronized (backgroundPaintlock) {
             if (bImage == null) {
-                paintBackground(gr);
+                paintBackground(g);
                 if (!printing)
                     initRepaint = true;
 
@@ -2402,32 +2903,16 @@ public class MovingArea extends JPanel {
         if (initRepaint && getComponentCount() == 0)
             init();
 
-        if (!DISABLE_RENDERING_HINTS && !isPrinting()) {
-            g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
-                    RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-                    RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                    RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
-                    RenderingHints.VALUE_STROKE_NORMALIZE);
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        }
+        applyQualityHints(g);
 
         if (enteredPanel != null && enteredPanel != pressedPanel)
             enteredPanel.paintBorder(g);
 
-        Composite comp = g.getComposite();
-        g.setComposite(a);
-
         if (mousePressed) {
-            if (pressedPanel != null)
+            if (pressedPanel != null) {
+                paintGlassSelection(g, pressedPanel.getBounds(), 1f);
                 pressedPanel.paint(g);
+            }
             if (activeObject instanceof Pin)
                 try {
                     ((Pin) activeObject).getSector().paint(g, this);
@@ -2436,12 +2921,13 @@ public class MovingArea extends JPanel {
                 }
             if (mouseSelection != null) {
                 for (MovingPanel panel : panels) {
-                    if (mouseSelection.contains(panel))
+                    if (mouseSelection.contains(panel)) {
+                        paintGlassSelection(g, panel.getBounds(), 0.85f);
                         panel.paint(g);
+                    }
                 }
             }
         }
-        g.setComposite(comp);
 
         if (enteredPanel instanceof IDEF0Object) {
             g.setColor(Color.BLACK);
@@ -2455,6 +2941,7 @@ public class MovingArea extends JPanel {
         if (!printing) {
 
             final int borderWidth = getIntOrdinate(BORDER_WIDTH);
+            g.setColor(withAlpha(accentColor, 160));
             switch (getBorderType()) {
                 case MovingPanel.LEFT: {
                     g.fillRect(getIntOrdinate(LEFT_PART), getIntOrdinate(TOP_PART),
@@ -2547,25 +3034,33 @@ public class MovingArea extends JPanel {
         }
 
         if (mouseSelection != null) {
-            g.setStroke(new BasicStroke(1.5f, 1, 1, 1, new float[]{1f, 5f},
-                    0f));
-            g.setColor(Color.DARK_GRAY);
+            Stroke oldStroke = g.getStroke();
+            Composite originalComposite = g.getComposite();
             if (mouseSelection.dr) {
-                if (mouseSelection.width >= 0 && mouseSelection.height >= 0)
-                    g.draw(mouseSelection);
-                else {
-                    double x = mouseSelection.x;
-                    double y = mouseSelection.y;
-                    if (mouseSelection.width < 0)
-                        x += mouseSelection.width;
-
-                    if (mouseSelection.height < 0)
-                        y += mouseSelection.height;
-                    g.draw(new Rectangle2D.Double(x, y, Math
-                            .abs(mouseSelection.width), Math
-                            .abs(mouseSelection.height)));
+                double x = mouseSelection.x;
+                double y = mouseSelection.y;
+                double width = mouseSelection.width;
+                double height = mouseSelection.height;
+                if (width < 0) {
+                    x += width;
+                    width = -width;
                 }
+                if (height < 0) {
+                    y += height;
+                    height = -height;
+                }
+                Rectangle2D selectionRect = new Rectangle2D.Double(x, y, width,
+                        height);
+                g.setStroke(new BasicStroke(1.2f, BasicStroke.CAP_ROUND,
+                        BasicStroke.JOIN_ROUND, 1f, new float[]{4f, 6f}, 0f));
+                g.setColor(withAlpha(accentColor, 180));
+                g.draw(selectionRect);
+                g.setComposite(AlphaComposite.SrcOver.derive(0.12f));
+                g.setColor(withAlpha(accentColor, 70));
+                g.fill(selectionRect);
             }
+            g.setComposite(originalComposite);
+            g.setStroke(oldStroke);
             mouseSelection.paint(g, this);
         }
     }
@@ -2608,40 +3103,22 @@ public class MovingArea extends JPanel {
         final Graphics2D g = (Graphics2D) gr;
         if (!isPrinting()) {
             PStringBounder.FONT_CONTEXT = g.getFontRenderContext();
-
-            g.setColor(getBackground());
-
-            if (showNet) {
-                g.setColor(getBackground());
-                g.fillRect(0, 0, getSize().width, getSize().height);
-                g.setColor(Color.black);
-                drawNet(g, 0, 0, getSize().width, getSize().height);
+            BufferedImage background = getGlassBackgroundImage();
+            if (background != null) {
+                g.drawImage(background, 0, 0, null);
             } else {
                 g.setColor(getBackground());
                 g.fillRect(0, 0, getSize().width, getSize().height);
             }
-            g.setColor(getForeground());
-
-            if (!DISABLE_RENDERING_HINTS && !isPrinting()) {
-                g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
-                        RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                        RenderingHints.VALUE_ANTIALIAS_ON);
-                g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-                        RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-                g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                        RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
-                        RenderingHints.VALUE_STROKE_NORMALIZE);
-                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            }
+            applyQualityHints(g);
         } else {
-
+            g.setColor(getBackground());
+            g.fillRect(0, 0, getSize().width, getSize().height);
         }
 
+        Color frameColor = isPrinting() ? Color.BLACK
+                : withAlpha(accentColor, 150);
+        g.setColor(frameColor);
         g.drawLine(0, 0, 0, getIntOrdinate(CLIENT_HEIGHT));
         g.drawLine(getIntOrdinate(CLIENT_WIDTH) - 1, 0,
                 getIntOrdinate(CLIENT_WIDTH) - 1, getIntOrdinate(CLIENT_HEIGHT));
@@ -2946,7 +3423,12 @@ public class MovingArea extends JPanel {
     }
 
     public void setZoom(final double zoom) {
-        this.zoom = zoom;
+        if (Double.doubleToLongBits(this.zoom) != Double.doubleToLongBits(zoom)) {
+            this.zoom = zoom;
+            invalidateGlassCache();
+        } else {
+            this.zoom = zoom;
+        }
     }
 
     @Override
@@ -3147,10 +3629,7 @@ public class MovingArea extends JPanel {
 
     public void netAction() {
         showNet = !showNet;
-        synchronized (backgroundPaintlock) {
-            bImage = null;
-        }
-        repaintAsync();
+        invalidateGlassCache();
     }
 
     public String getFunctionNumber() {
@@ -4034,5 +4513,86 @@ public class MovingArea extends JPanel {
 
     public void setbImage(BufferedImage bImage) {
         this.bImage = bImage;
+    }
+
+    public static final class GlassPalette {
+
+        public static final String BACKGROUND_KEY = "IDEF.GlassBackground";
+        public static final String HIGHLIGHT_KEY = "IDEF.GlassHighlight";
+        public static final String GRID_PRIMARY_KEY = "IDEF.GlassGridPrimary";
+        public static final String GRID_SECONDARY_KEY = "IDEF.GlassGridSecondary";
+        public static final String SPARKLE_KEY = "IDEF.GlassSparkle";
+
+        public static final Color DEFAULT_BACKGROUND = new Color(244, 248, 255);
+        public static final Color DEFAULT_HIGHLIGHT = new Color(255, 255, 255, 212);
+        public static final Color DEFAULT_GRID_PRIMARY = new Color(139, 159, 210, 180);
+        public static final Color DEFAULT_GRID_SECONDARY = new Color(198, 210, 240, 150);
+        public static final Color DEFAULT_SPARKLE = new Color(255, 255, 255, 210);
+
+        private final Color background;
+        private final Color highlight;
+        private final Color gridPrimary;
+        private final Color gridSecondary;
+        private final Color sparkle;
+
+        public GlassPalette(Color background, Color highlight, Color gridPrimary,
+                            Color gridSecondary, Color sparkle) {
+            this.background = background;
+            this.highlight = highlight;
+            this.gridPrimary = gridPrimary;
+            this.gridSecondary = gridSecondary;
+            this.sparkle = sparkle;
+        }
+
+        public static GlassPalette fromOptions() {
+            return new GlassPalette(
+                    Options.getColor(BACKGROUND_KEY, DEFAULT_BACKGROUND),
+                    Options.getColor(HIGHLIGHT_KEY, DEFAULT_HIGHLIGHT),
+                    Options.getColor(GRID_PRIMARY_KEY, DEFAULT_GRID_PRIMARY),
+                    Options.getColor(GRID_SECONDARY_KEY, DEFAULT_GRID_SECONDARY),
+                    Options.getColor(SPARKLE_KEY, DEFAULT_SPARKLE));
+        }
+
+        public Color getBackground() {
+            return background;
+        }
+
+        public Color getHighlight() {
+            return highlight;
+        }
+
+        public Color getGridPrimary() {
+            return gridPrimary;
+        }
+
+        public Color getGridSecondary() {
+            return gridSecondary;
+        }
+
+        public Color getSparkle() {
+            return sparkle;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof GlassPalette)) {
+                return false;
+            }
+            GlassPalette that = (GlassPalette) o;
+            return Objects.equals(background, that.background)
+                    && Objects.equals(highlight, that.highlight)
+                    && Objects.equals(gridPrimary, that.gridPrimary)
+                    && Objects.equals(gridSecondary, that.gridSecondary)
+                    && Objects.equals(sparkle, that.sparkle);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(background, highlight, gridPrimary, gridSecondary,
+                    sparkle);
+        }
     }
 }

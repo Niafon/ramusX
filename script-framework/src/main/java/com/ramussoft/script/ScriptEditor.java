@@ -19,6 +19,7 @@ import com.ramussoft.gui.common.AbstractView;
 import com.ramussoft.gui.common.GUIFramework;
 import com.ramussoft.gui.common.TabView;
 import com.ramussoft.gui.common.event.ActionListener;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class ScriptEditor extends AbstractView implements TabView, Constants {
 
@@ -89,8 +90,7 @@ public class ScriptEditor extends AbstractView implements TabView, Constants {
 
         public SaveScriptAction() {
             putValue(ACTION_COMMAND_KEY, "Action.SaveScript");
-            putValue(Action.SMALL_ICON, new ImageIcon(getClass().getResource(
-                    "/com/ramussoft/gui/file-save.png")));
+            putValue(Action.SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/file-save.png"));
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
                     KeyEvent.CTRL_MASK + KeyEvent.ALT_MASK));
         }

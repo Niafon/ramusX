@@ -1,0 +1,14 @@
+{
+  "textures": [
+    {
+      "id": "glass-grid",
+      "title": "Glass Grid",
+      "path": "backgrounds/glass-grid.png"
+    },
+    {
+      "id": "glass-sheen",
+      "title": "Glass Sheen",
+      "path": "backgrounds/glass-sheen.png"
+    }
+  ]
+}

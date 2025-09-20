@@ -32,6 +32,7 @@ import com.ramussoft.gui.qualifier.Commands;
 import com.ramussoft.report.DocBookExporter;
 import com.ramussoft.report.ReportLoadCallback;
 import com.ramussoft.report.ReportResourceManager;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class DocBookScriptReportEditorView extends ReportEditorView {
 
@@ -185,8 +186,7 @@ public class DocBookScriptReportEditorView extends ReportEditorView {
                     putValue(ACTION_COMMAND_KEY, "Action.ExportReportToFile");
                     putValue(
                             SMALL_ICON,
-                            new ImageIcon(getClass().getResource(
-                                    "/com/ramussoft/gui/export.png")));
+                            IconLoader.getIcon(getClass(), "/com/ramussoft/gui/export.png"));
                 }
 
                 @Override

@@ -87,6 +87,7 @@ import com.ramussoft.gui.common.event.ViewTitleListener;
 import com.ramussoft.gui.common.prefrence.Options;
 import com.ramussoft.gui.common.print.PrintPreviewComponent;
 import com.ramussoft.gui.common.print.RamusPrintable;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class GUIPluginFactory extends AbstractGUIPluginFactory {
 
@@ -766,8 +767,7 @@ public class GUIPluginFactory extends AbstractGUIPluginFactory {
             } else {
                 ImageIcon icon = (ImageIcon) action.getValue(Action.SMALL_ICON);
                 if (icon == null) {
-                    icon = new ImageIcon(getClass().getResource(
-                            "/com/ramussoft/gui/icon.png"));
+                    icon = IconLoader.getIcon(getClass(), "/com/ramussoft/gui/icon.png");
                 }
                 final String command = (String) action
                         .getValue(Action.ACTION_COMMAND_KEY);

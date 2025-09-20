@@ -59,11 +59,17 @@ import com.ramussoft.gui.common.prefrence.Options;
 import com.ramussoft.gui.common.print.PrintPreviewComponent;
 import com.ramussoft.gui.common.print.RamusPrintable;
 import com.ramussoft.gui.core.AboutPlugin;
+import com.formdev.flatlaf.FlatClientProperties;
 import com.ramussoft.gui.core.LookAndFeelPlugin;
 import com.ramussoft.gui.core.PlugableFrame;
 import com.ramussoft.gui.core.PreferenciesPlugin;
 import com.ramussoft.gui.core.ShowViewPlugin;
 import com.ramussoft.gui.core.ShowWorkspacePlugin;
+<<<<<<< ours
+import com.ramussoft.gui.core.laf.LiquidGlassBackgroundPanel;
+=======
+import com.ramussoft.gui.common.icons.IconLoader;
+>>>>>>> theirs
 
 public class SimleGUIPluginFactory extends AbstractGUIPluginFactory {
 
@@ -573,7 +579,13 @@ public class SimleGUIPluginFactory extends AbstractGUIPluginFactory {
 
         // control.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
         contentArea = control.getContentArea();
-        plugableFrame.add(contentArea, BorderLayout.CENTER);
+
+        LiquidGlassBackgroundPanel backgroundPanel = new LiquidGlassBackgroundPanel();
+        backgroundPanel.setLayout(new BorderLayout());
+        backgroundPanel.add(contentArea, BorderLayout.CENTER);
+        backgroundPanel.putClientProperty(FlatClientProperties.STYLE,
+                "background:null; borderWidth:0; focusWidth:0; innerFocusWidth:0;");
+        plugableFrame.setContentPane(backgroundPanel);
 
         for (UniqueView view : uniqueViews) {
             String id = view.getId();
@@ -670,8 +682,7 @@ public class SimleGUIPluginFactory extends AbstractGUIPluginFactory {
 
                 ImageIcon icon = (ImageIcon) action.getValue(Action.SMALL_ICON);
                 if (icon == null) {
-                    icon = new ImageIcon(getClass().getResource(
-                            "/com/ramussoft/gui/icon.png"));
+                    icon = IconLoader.getIcon(getClass(), "/com/ramussoft/gui/icon.png");
                 }
                 String tooltip = (String) action
                         .getValue(Action.LONG_DESCRIPTION);

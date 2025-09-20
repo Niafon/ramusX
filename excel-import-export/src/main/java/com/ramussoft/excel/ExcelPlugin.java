@@ -18,6 +18,7 @@ import com.ramussoft.gui.common.GlobalResourcesManager;
 import com.ramussoft.gui.qualifier.table.AbstractElementActionPlugin;
 import com.ramussoft.gui.qualifier.table.TableTabView;
 import com.ramussoft.gui.qualifier.table.TableView;
+import com.ramussoft.gui.common.icons.IconLoader;
 
 public class ExcelPlugin extends AbstractElementActionPlugin {
 
@@ -61,8 +62,7 @@ public class ExcelPlugin extends AbstractElementActionPlugin {
             this.tableView = tableView;
             putValue(ACTION_COMMAND_KEY, "Action.ExportToExcel");
             putValue(ACTION_STRING_GETTER, ExcelPlugin.this);
-            putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
-                    "/com/ramussoft/excel/export-to-excel.png")));
+            putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/excel/export-to-excel.png"));
         }
 
         @Override
@@ -122,8 +122,7 @@ public class ExcelPlugin extends AbstractElementActionPlugin {
             this.tableView = tableView;
             putValue(ACTION_COMMAND_KEY, "Action.ImportFromExcel");
             putValue(ACTION_STRING_GETTER, ExcelPlugin.this);
-            putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
-                    "/com/ramussoft/excel/import-from-excel.png")));
+            putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/excel/import-from-excel.png"));
         }
 
         @Override
