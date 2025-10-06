@@ -56,7 +56,6 @@ import com.ramussoft.gui.common.GUIFramework;
 import com.ramussoft.gui.common.GlobalResourcesManager;
 import com.ramussoft.gui.qualifier.table.event.SelectionEvent;
 import com.ramussoft.gui.qualifier.table.event.SelectionListener;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class RowTreeTable extends JXTreeTable implements ImportExport,
         ElementsTable {
@@ -140,9 +139,12 @@ public class RowTreeTable extends JXTreeTable implements ImportExport,
     public RowTreeTable(AccessRules accessRules, RowSet rowSet,
                         AttributePlugin[] plugins, GUIFramework framework,
                         RowTreeTableModel model) {
-        setLeafIcon(IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/sheet.png"));
-        setFolderIcon(IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/folder.png"));
-        setFolderSheetIcon(IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/folder-sheet.png"));
+        setLeafIcon(new ImageIcon(getClass().getResource(
+                "/com/ramussoft/gui/table/sheet.png")));
+        setFolderIcon(new ImageIcon(getClass().getResource(
+                "/com/ramussoft/gui/table/folder.png")));
+        setFolderSheetIcon(new ImageIcon(getClass().getResource(
+                "/com/ramussoft/gui/table/folder-sheet.png")));
         this.accessRules = accessRules;
         this.rowSet = rowSet;
         this.plugins = plugins;

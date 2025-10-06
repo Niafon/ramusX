@@ -176,7 +176,7 @@ public class IconPreviewPanel extends JPanel {
     }
 
     private boolean isImage(String string) {
-        return string.endsWith(".png") || (string.endsWith(".png"));
+        return string.endsWith(".png") || (string.endsWith(".gif"));
     }
 
     public IconPersistent select(JFrame frame) {

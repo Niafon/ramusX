@@ -34,7 +34,6 @@ import com.ramussoft.gui.common.prefrence.Options;
 import com.ramussoft.gui.qualifier.QualifierView;
 import com.ramussoft.gui.qualifier.table.TableView;
 import com.ramussoft.gui.qualifier.table.TreeTableNode;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class ReportsView extends TableView implements UniqueView {
 
@@ -59,7 +58,8 @@ public class ReportsView extends TableView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "Action.OpenReport");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/open.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/open.png")));
         }
 
         @Override

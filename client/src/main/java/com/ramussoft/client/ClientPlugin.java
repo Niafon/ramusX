@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,7 +18,6 @@ import com.ramussoft.common.Engine;
 import com.ramussoft.common.cached.Cached;
 import com.ramussoft.gui.common.AbstractViewPlugin;
 import com.ramussoft.gui.common.ActionDescriptor;
-import com.ramussoft.gui.common.icons.IconLoader;
 import com.ramussoft.gui.common.BaseDialog;
 import com.ramussoft.gui.common.GlobalResourcesManager;
 import com.ramussoft.gui.qualifier.Commands;
@@ -150,7 +150,7 @@ public class ClientPlugin extends AbstractViewPlugin implements Commands {
     };
 
     private ImageIcon getIcon(String resourceName) {
-        return IconLoader.getIcon(getClass(), resourceName);
+        return new ImageIcon(getClass().getResource(resourceName));
     }
 
     @Override

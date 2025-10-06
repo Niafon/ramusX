@@ -24,7 +24,6 @@ import com.ramussoft.gui.common.GUIFramework;
 import com.ramussoft.gui.common.prefrence.Options;
 import com.ramussoft.gui.qualifier.table.ElementActionPlugin;
 import com.ramussoft.gui.qualifier.table.TableTabView;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class LogPlugin extends AbstractViewPlugin implements
         ElementActionPlugin, TableEditorActionModifier {
@@ -37,7 +36,8 @@ public class LogPlugin extends AbstractViewPlugin implements
     @Override
     public Action[] getActions(final TableTabView tableView) {
 
-        return new Action[]{new AbstractAction("EventType.qualifierLog", IconLoader.getIcon(getClass(), "/com/ramussoft/client/log/log.png")) {
+        return new Action[]{new AbstractAction("EventType.qualifierLog", new ImageIcon(
+                getClass().getResource("/com/ramussoft/client/log/log.png"))) {
 
             /**
              *
@@ -86,7 +86,8 @@ public class LogPlugin extends AbstractViewPlugin implements
     @Override
     public Action[] modify(Action[] actions, final TableEditor tableEditor) {
         actions = Arrays.copyOf(actions, actions.length + 1);
-        actions[actions.length - 1] = new AbstractAction("Log", IconLoader.getIcon(getClass(), "/com/ramussoft/client/log/log.png")) {
+        actions[actions.length - 1] = new AbstractAction("Log", new ImageIcon(
+                getClass().getResource("/com/ramussoft/client/log/log.png"))) {
 
             /**
              *

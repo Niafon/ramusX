@@ -58,7 +58,6 @@ import com.ramussoft.pb.idef.frames.IDEFPanel;
 import com.ramussoft.pb.idef.frames.UserTemplatesDialog;
 import com.ramussoft.pb.idef.frames.IDEFPanel.Zoom;
 import com.ramussoft.pb.types.GlobalId;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 /**
  * Головне вікно програми.
@@ -69,9 +68,10 @@ import com.ramussoft.gui.common.icons.IconLoader;
 public class MainFrame implements ActionListener {
 
     public static Image mainIcon = Toolkit.getDefaultToolkit().getImage(
-            MainFrame.class.getResource("/images/main.png"));
+            MainFrame.class.getResource("/images/main.gif"));
 
-    public ImageIcon clasificatorIcon = IconLoader.getIcon(getClass(), "/images/clasificatorIcon.png");
+    public ImageIcon clasificatorIcon = new ImageIcon(getClass().getResource(
+            "/images/clasificatorIcon.png"));
 
     static public final int MAIN_MODEL = GlobalId.GLOBAL_RESERVED + 1;
 
@@ -460,13 +460,16 @@ public class MainFrame implements ActionListener {
 
     protected void createActions() {
         createAction(NEW_PROJECT, ResourceLoader.getString(NEW_PROJECT),
-                ResourceLoader.getString(NEW_PROJECT), IconLoader.getIcon(getClass(), "/images/new.png"),
+                ResourceLoader.getString(NEW_PROJECT), new ImageIcon(getClass()
+                        .getResource("/images/new.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         createAction(OPEN_PROJECT, ResourceLoader.getString(OPEN_PROJECT),
-                ResourceLoader.getString(OPEN_PROJECT), IconLoader.getIcon(getClass(), "/images/open.png"),
+                ResourceLoader.getString(OPEN_PROJECT), new ImageIcon(
+                        getClass().getResource("/images/open.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         createAction(SAVE_PROJECT, ResourceLoader.getString(SAVE_PROJECT),
-                ResourceLoader.getString(SAVE_PROJECT), IconLoader.getIcon(getClass(), "/images/save.png"),
+                ResourceLoader.getString(SAVE_PROJECT), new ImageIcon(
+                        getClass().getResource("/images/save.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         createAction(SAVE_PROJECT_AS,
                 ResourceLoader.getString(SAVE_PROJECT_AS),
@@ -481,29 +484,36 @@ public class MainFrame implements ActionListener {
                 ResourceLoader.getString(OPEN_WEB_SERVER), null, null);
 
         createAction(ADD, ResourceLoader.getString(ADD),
-                ResourceLoader.getString(ADD), IconLoader.getIcon(getClass(), "/images/add.png"),
+                ResourceLoader.getString(ADD), new ImageIcon(getClass()
+                        .getResource("/images/add.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ADD, ActionEvent.CTRL_MASK));
 
         createAction(REMOVE, ResourceLoader.getString(REMOVE),
-                ResourceLoader.getString(REMOVE), IconLoader.getIcon(getClass(), "/images/remove.png"),
+                ResourceLoader.getString(REMOVE), new ImageIcon(getClass()
+                        .getResource("/images/remove.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 
         createAction(EDIT, ResourceLoader.getString(EDIT),
-                ResourceLoader.getString(EDIT), IconLoader.getIcon(getClass(), "/images/edit.png"), null);
+                ResourceLoader.getString(EDIT), new ImageIcon(getClass()
+                        .getResource("/images/edit.png")), null);
 
         createAction(BRAKE_DFDSROLE_CONNECTION);
         createAction(INSERT, ResourceLoader.getString(INSERT),
-                ResourceLoader.getString(INSERT), IconLoader.getIcon(getClass(), "/images/insert.png"),
+                ResourceLoader.getString(INSERT), new ImageIcon(getClass()
+                        .getResource("/images/insert.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
         createAction(ADD_CHILD, ResourceLoader.getString(ADD_CHILD),
-                ResourceLoader.getString(ADD_CHILD), IconLoader.getIcon(getClass(), "/images/add_child.png"),
+                ResourceLoader.getString(ADD_CHILD), new ImageIcon(getClass()
+                        .getResource("/images/add_child.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
         createAction(LEVEL_UP, ResourceLoader.getString(LEVEL_UP),
-                ResourceLoader.getString(LEVEL_UP), IconLoader.getIcon(getClass(), "/images/left.png"),
+                ResourceLoader.getString(LEVEL_UP), new ImageIcon(getClass()
+                        .getResource("/images/left.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.CTRL_MASK));
 
         createAction(LEVEL_DOWN, ResourceLoader.getString(LEVEL_DOWN),
-                ResourceLoader.getString(LEVEL_DOWN), IconLoader.getIcon(getClass(), "/images/right.png"),
+                ResourceLoader.getString(LEVEL_DOWN), new ImageIcon(getClass()
+                        .getResource("/images/right.png")),
                 KeyStroke
                         .getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.CTRL_MASK));
         createAction(ADD_MODEL_TO_TEMPLATE);
@@ -533,18 +543,22 @@ public class MainFrame implements ActionListener {
 		 */
 
         createAction(SELECT_CLEAN, ResourceLoader.getString(SELECT_CLEAN),
-                ResourceLoader.getString(SELECT_CLEAN), IconLoader.getIcon(getClass(), "/images/sel_ather.png"), null);
+                ResourceLoader.getString(SELECT_CLEAN), new ImageIcon(
+                        getClass().getResource("/images/sel_ather.png")), null);
 
         createAction(CUT, ResourceLoader.getString(CUT),
-                ResourceLoader.getString(CUT), IconLoader.getIcon(getClass(), "/images/cut.png"),
+                ResourceLoader.getString(CUT), new ImageIcon(getClass()
+                        .getResource("/images/cut.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
 
         createAction(COPY, ResourceLoader.getString(COPY),
-                ResourceLoader.getString(COPY), IconLoader.getIcon(getClass(), "/images/copy.png"),
+                ResourceLoader.getString(COPY), new ImageIcon(getClass()
+                        .getResource("/images/copy.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
 
         createAction(PASTE, ResourceLoader.getString(PASTE),
-                ResourceLoader.getString(PASTE), IconLoader.getIcon(getClass(), "/images/paste.png"),
+                ResourceLoader.getString(PASTE), new ImageIcon(getClass()
+                        .getResource("/images/paste.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
 
         createAction(MOVE_ROWS);
@@ -554,32 +568,35 @@ public class MainFrame implements ActionListener {
         // --------IDEF0-------------
 
         createAction(IDEF0_UNDO,
-                IconLoader.getIcon(getClass(), "/images/iUndo.png"),
+                new ImageIcon(getClass().getResource("/images/iUndo.png")),
                 KeyStroke
                         .getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
 
         createAction(IDEF0_REDO,
-                IconLoader.getIcon(getClass(), "/images/iRedo.png"),
+                new ImageIcon(getClass().getResource("/images/iRedo.png")),
                 KeyStroke
                         .getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
 
         createAction(FUNCTION_TOOL, ResourceLoader.getString(FUNCTION_TOOL),
-                ResourceLoader.getString(FUNCTION_TOOL), IconLoader.getIcon(getClass(), "/images/block.png"),
+                ResourceLoader.getString(FUNCTION_TOOL), new ImageIcon(
+                        getClass().getResource("/images/block.gif")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, 0));
 
         createAction(CURSOR_TOOL, ResourceLoader.getString(CURSOR_TOOL),
-                ResourceLoader.getString(CURSOR_TOOL), IconLoader.getIcon(getClass(), "/images/cursor.png"),
+                ResourceLoader.getString(CURSOR_TOOL), new ImageIcon(getClass()
+                        .getResource("/images/cursor.gif")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0));
 
 		/*
 		 * createAction(FUNCTION_TOOL, ResourceLoader.getString(FUNCTION_TOOL),
 		 * ResourceLoader.getString(FUNCTION_TOOL), new ImageIcon(
-		 * getClass().getResource("/images/block.png")), KeyStroke
+		 * getClass().getResource("/images/block.gif")), KeyStroke
 		 * .getKeyStroke(KeyEvent.VK_X, 0));
 		 */
 
         createAction(ARROW_TOOL, ResourceLoader.getString(ARROW_TOOL),
-                ResourceLoader.getString(ARROW_TOOL), IconLoader.getIcon(getClass(), "/images/arrow.png"),
+                ResourceLoader.getString(ARROW_TOOL), new ImageIcon(getClass()
+                        .getResource("/images/arrow.gif")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
         createAction(ARROW_CONNECTIONS,
@@ -587,21 +604,25 @@ public class MainFrame implements ActionListener {
                 ResourceLoader.getString("ArrowConnections.menu"), null, null);
 
         createAction(TILDA_TOOL, ResourceLoader.getString(TILDA_TOOL),
-                ResourceLoader.getString(TILDA_TOOL), IconLoader.getIcon(getClass(), "/images/tilda.png"),
+                ResourceLoader.getString(TILDA_TOOL), new ImageIcon(getClass()
+                        .getResource("/images/tilda.gif")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, 0));
 
         createAction(TEXT_TOOL, ResourceLoader.getString(TEXT_TOOL),
-                ResourceLoader.getString(TEXT_TOOL), IconLoader.getIcon(getClass(), "/images/text.png"),
+                ResourceLoader.getString(TEXT_TOOL), new ImageIcon(getClass()
+                        .getResource("/images/text.gif")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_B, 0));
 
         createAction(
                 EXTERNAL_REFERENCE_TOOL,
                 ResourceLoader.getString(EXTERNAL_REFERENCE_TOOL),
                 ResourceLoader.getString(EXTERNAL_REFERENCE_TOOL),
-                IconLoader.getIcon(getClass(), "/images/external-reference.png"), null);
+                new ImageIcon(getClass().getResource(
+                        "/images/external-reference.gif")), null);
 
         createAction(DFDS_ROLE_TOOL, ResourceLoader.getString(DFDS_ROLE_TOOL),
-                ResourceLoader.getString(DFDS_ROLE_TOOL), IconLoader.getIcon(getClass(), "/images/role.png"), null);
+                ResourceLoader.getString(DFDS_ROLE_TOOL), new ImageIcon(
+                        getClass().getResource("/images/role.png")), null);
 
         createAction(DFDS_ROLE_COPY_VISUAL);
 
@@ -609,19 +630,24 @@ public class MainFrame implements ActionListener {
 
         createAction(DATA_STORE_TOOL,
                 ResourceLoader.getString(DATA_STORE_TOOL),
-                ResourceLoader.getString(DATA_STORE_TOOL), IconLoader.getIcon(getClass(), "/images/data-store.png"), null);
+                ResourceLoader.getString(DATA_STORE_TOOL), new ImageIcon(
+                        getClass().getResource("/images/data-store.gif")), null);
 
         createAction(GO_TO_PARENT, ResourceLoader.getString(GO_TO_PARENT),
-                ResourceLoader.getString(GO_TO_PARENT), IconLoader.getIcon(getClass(), "/images/up.png"), null);
+                ResourceLoader.getString(GO_TO_PARENT), new ImageIcon(
+                        getClass().getResource("/images/up.gif")), null);
 
         createAction(GO_TO_CHILD, ResourceLoader.getString(GO_TO_CHILD),
-                ResourceLoader.getString(GO_TO_CHILD), IconLoader.getIcon(getClass(), "/images/down.png"), null);
+                ResourceLoader.getString(GO_TO_CHILD), new ImageIcon(getClass()
+                        .getResource("/images/down.gif")), null);
 
         createAction(RELOAD_SAVE, ResourceLoader.getString(RELOAD_SAVE),
-                ResourceLoader.getString(RELOAD_SAVE), IconLoader.getIcon(getClass(), "/images/refresh.png"), null);
+                ResourceLoader.getString(RELOAD_SAVE), new ImageIcon(getClass()
+                        .getResource("/images/refresh.png")), null);
 
         createAction(IDEF0_NET, ResourceLoader.getString(IDEF0_NET),
-                ResourceLoader.getString(IDEF0_NET), IconLoader.getIcon(getClass(), "/images/net.png"),
+                ResourceLoader.getString(IDEF0_NET), new ImageIcon(getClass()
+                        .getResource("/images/net.png")),
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, 0));
 
         createAction(CENTER_ALL_SECTORS,
@@ -693,22 +719,26 @@ public class MainFrame implements ActionListener {
         // --------------report tool bar--
 
         createAction(MOVE_UP, ResourceLoader.getString(MOVE_UP),
-                ResourceLoader.getString(MOVE_UP), IconLoader.getIcon(getClass(), "/images/top.png"), null);
+                ResourceLoader.getString(MOVE_UP), new ImageIcon(getClass()
+                        .getResource("/images/top.png")), null);
 
         createAction(MOVE_DOWN, ResourceLoader.getString(MOVE_DOWN),
-                ResourceLoader.getString(MOVE_DOWN), IconLoader.getIcon(getClass(), "/images/bottom.png"), null);
+                ResourceLoader.getString(MOVE_DOWN), new ImageIcon(getClass()
+                        .getResource("/images/bottom.png")), null);
 
         createAction(GENARATE, ResourceLoader.getString(GENARATE),
-                ResourceLoader.getString(GENARATE), IconLoader.getIcon(getClass(), "/images/build.png"), null);
+                ResourceLoader.getString(GENARATE), new ImageIcon(getClass()
+                        .getResource("/images/build.png")), null);
 
         createAction(IMPORT_REPORT_FROM_XML,
                 ResourceLoader.getString(IMPORT_REPORT_FROM_XML),
                 ResourceLoader.getString(IMPORT_REPORT_FROM_XML),
-                IconLoader.getIcon(getClass(), "/images/import.png"),
+                new ImageIcon(getClass().getResource("/images/import.png")),
                 null);
         createAction(EXPORT_REPORT_TO_XML,
                 ResourceLoader.getString(EXPORT_REPORT_TO_XML),
-                ResourceLoader.getString(EXPORT_REPORT_TO_XML), IconLoader.getIcon(getClass(), "/images/export.png"), null);
+                ResourceLoader.getString(EXPORT_REPORT_TO_XML), new ImageIcon(
+                        getClass().getResource("/images/export.png")), null);
 
         // -------------help------------
 

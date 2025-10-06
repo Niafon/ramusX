@@ -16,6 +16,5 @@ dependencies {
     implementation 'org.dockingframes:docking-frames-common:1.1.1'
     implementation 'javax.help:javahelp:2.0.05'
     implementation 'com.formdev:flatlaf:3.2'
-    implementation 'com.formdev:flatlaf-extras:3.2'
     testImplementation group: 'junit', name: 'junit', version: '4.11'
 }

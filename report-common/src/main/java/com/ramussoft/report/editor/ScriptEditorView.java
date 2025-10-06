@@ -34,7 +34,6 @@ import com.ramussoft.gui.common.GlobalResourcesManager;
 import com.ramussoft.gui.common.prefrence.Options;
 import com.ramussoft.report.ReportPlugin;
 import com.ramussoft.report.ReportResourceManager;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public abstract class ScriptEditorView extends SubView {
 
@@ -139,7 +138,8 @@ public abstract class ScriptEditorView extends SubView {
 
         public FormatAction() {
             putValue(ACTION_COMMAND_KEY, "Format.HTML");
-            putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/report/format.png"));
+            putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
+                    "/com/ramussoft/report/format.png")));
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F,
                     KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
         }
@@ -168,7 +168,8 @@ public abstract class ScriptEditorView extends SubView {
 
         public ExportToJSSP() {
             putValue(ACTION_COMMAND_KEY, "Action.ExportReportToJSSP");
-            putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/export.png"));
+            putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
+                    "/com/ramussoft/gui/export.png")));
         }
 
         @Override
@@ -189,7 +190,8 @@ public abstract class ScriptEditorView extends SubView {
 
         public ImportFromJSSP() {
             putValue(ACTION_COMMAND_KEY, "Action.ImportReportFromJSSP");
-            putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/import.png"));
+            putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
+                    "/com/ramussoft/gui/import.png")));
         }
 
         @Override

@@ -9,10 +9,9 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLayer;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
 import com.ramussoft.gui.common.AbstractGUIPluginFactory;
@@ -22,9 +21,6 @@ import com.ramussoft.gui.common.GUIFramework;
 import com.ramussoft.gui.common.GlobalResourcesManager;
 import com.ramussoft.gui.common.event.ActionListener;
 import com.ramussoft.gui.common.prefrence.Options;
-import com.formdev.flatlaf.FlatClientProperties;
-import com.ramussoft.gui.core.laf.LiquidGlassToolBar;
-import com.ramussoft.gui.core.laf.WorkspaceHighlightLayerUI;
 
 public class ShowWorkspacePlugin extends AbstractViewPlugin {
 
@@ -184,7 +180,8 @@ public class ShowWorkspacePlugin extends AbstractViewPlugin {
     }
 
     public void createWorkspaceToolBar() {
-        LiquidGlassToolBar workspaceToolBar = new LiquidGlassToolBar();
+        JToolBar workspaceToolBar = new JToolBar();
+        workspaceToolBar.setFloatable(false);
         for (ActionDescriptor descriptor : getActionDescriptors()) {
             final Action action = descriptor.getAction();
             if (action instanceof ShowWorkspaceAction) {
@@ -200,15 +197,10 @@ public class ShowWorkspacePlugin extends AbstractViewPlugin {
                     }
                 });
                 button.setFocusable(false);
-                button.setOpaque(false);
-                button.putClientProperty(FlatClientProperties.STYLE,
-                        "arc:20; focusWidth:1; innerFocusWidth:0; borderWidth:0; background:null;");
                 workspaceToolBar.add(button);
             }
         }
-        WorkspaceHighlightLayerUI layerUI = new WorkspaceHighlightLayerUI();
-        JLayer<JComponent> layer = new JLayer<JComponent>(workspaceToolBar, layerUI);
-        factory.setNorthEastCornerComponent(layer);
+        factory.setNorthEastCornerComponent(workspaceToolBar);
     }
 
     private String cut(String value) {

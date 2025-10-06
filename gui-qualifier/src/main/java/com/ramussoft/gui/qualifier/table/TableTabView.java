@@ -31,7 +31,6 @@ import com.ramussoft.gui.common.GUIPlugin;
 import com.ramussoft.gui.common.GlobalResourcesManager;
 import com.ramussoft.gui.common.event.ActionListener;
 import com.ramussoft.gui.eval.SetFormulaDialog;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public abstract class TableTabView extends TableView {
 
@@ -217,7 +216,8 @@ public abstract class TableTabView extends TableView {
             putValue(ACTION_COMMAND_KEY, "Action.Recalculate");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/recalculate.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/table/recalculate.png")));
         }
     }
 
@@ -234,7 +234,8 @@ public abstract class TableTabView extends TableView {
             putValue(ACTION_COMMAND_KEY, "Action.SetFormula");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/formula.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/table/formula.png")));
             setEnabled(false);
         }
 
@@ -268,7 +269,10 @@ public abstract class TableTabView extends TableView {
             putValue(ACTION_COMMAND_KEY, "Action.ElementsToQualifier");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/element-to-qualifier.png"));
+                    new ImageIcon(
+                            getClass()
+                                    .getResource(
+                                            "/com/ramussoft/gui/table/element-to-qualifier.png")));
         }
 
         @Override

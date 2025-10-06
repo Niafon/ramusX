@@ -29,7 +29,6 @@ import com.ramussoft.gui.common.GUIFramework;
 import com.ramussoft.gui.common.GlobalResourcesManager;
 import com.ramussoft.gui.common.StringGetter;
 import com.ramussoft.gui.common.prefrence.Options;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class SelectableTableView extends TableView {
 
@@ -48,7 +47,8 @@ public class SelectableTableView extends TableView {
             putValue(ACTION_COMMAND_KEY, "Action.CheckAll");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/check-all.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/table/check-all.png")));
             // setEnabled(false);
         }
 
@@ -70,7 +70,8 @@ public class SelectableTableView extends TableView {
             putValue(ACTION_COMMAND_KEY, "Action.UncheckAll");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/uncheck-all.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/table/uncheck-all.png")));
             // setEnabled(false);
         }
 

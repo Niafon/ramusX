@@ -42,7 +42,6 @@ import com.ramussoft.gui.qualifier.table.RowTreeTableModel;
 import com.ramussoft.gui.qualifier.table.Rows;
 import com.ramussoft.gui.qualifier.table.TreeTableNode;
 import com.ramussoft.pb.idef.visual.IDEF0Object;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public abstract class ModelsPanel extends AbstractModelsPanel {
 
@@ -240,11 +239,14 @@ public abstract class ModelsPanel extends AbstractModelsPanel {
                 fixTable(node2);
     }
 
-    private Icon note = IconLoader.getIcon(getClass(), "/images/note.png");
+    private Icon note = new ImageIcon(getClass()
+            .getResource("/images/note.png"));
 
-    private Icon function = IconLoader.getIcon(getClass(), "/images/function.png");
+    private Icon function = new ImageIcon(getClass().getResource(
+            "/images/function.png"));
 
-    private Icon model = IconLoader.getIcon(getClass(), "/images/idef0-model.png");
+    private Icon model = new ImageIcon(getClass().getResource(
+            "/images/idef0-model.png"));
 
     /**
      * Метод визначає код функціонального блоку у відповідності до стандарту

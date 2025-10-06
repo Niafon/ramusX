@@ -30,7 +30,6 @@ import com.ramussoft.gui.qualifier.Commands;
 import com.ramussoft.gui.qualifier.QualifierView;
 
 import static com.ramussoft.gui.qualifier.QualifierView.EDIT_NAME_CLICK_DELAY;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class ElistView extends AbstractUniqueView implements UniqueView,
         Commands {
@@ -180,7 +179,8 @@ public class ElistView extends AbstractUniqueView implements UniqueView,
             putValue(ACTION_COMMAND_KEY, "Action.EListProperties");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/preferencies.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/preferencies.png")));
             setEnabled(false);
         }
 
@@ -213,7 +213,8 @@ public class ElistView extends AbstractUniqueView implements UniqueView,
             putValue(ACTION_COMMAND_KEY, "Action.CreateElementList");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/add.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/table/add.png")));
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS,
                     KeyEvent.CTRL_MASK));
         }
@@ -248,7 +249,8 @@ public class ElistView extends AbstractUniqueView implements UniqueView,
             putValue(ACTION_COMMAND_KEY, "Action.DeleteElementList");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/delete.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/table/delete.png")));
             putValue(ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
             setEnabled(false);
@@ -278,7 +280,8 @@ public class ElistView extends AbstractUniqueView implements UniqueView,
             putValue(ACTION_COMMAND_KEY, "Action.OpenElementListInTable");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/open.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/open.png")));
             putValue(
                     ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK
@@ -305,7 +308,8 @@ public class ElistView extends AbstractUniqueView implements UniqueView,
             putValue(ACTION_COMMAND_KEY, "Action.OpenElementList");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/open-element-list.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/open-element-list.png")));
             putValue(
                     ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_MASK

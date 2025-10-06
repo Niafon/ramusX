@@ -74,7 +74,6 @@ import com.ramussoft.pb.frames.setup.OwnerClasificatorsDialog;
 import com.ramussoft.pb.idef.elements.ArrowPainter;
 import com.ramussoft.pb.idef.elements.PaintSector;
 import com.ramussoft.pb.idef.visual.MovingArea;
-import com.ramussoft.pb.idef.visual.MovingArea.GlassPalette;
 import com.ramussoft.pb.idef.visual.MovingFunction;
 import com.ramussoft.pb.idef.visual.MovingLabel;
 import com.ramussoft.pb.idef.visual.MovingText;
@@ -128,9 +127,7 @@ public class IDEFPanel extends ViewPanel {
     private MainFrame frame;
 
     public static Color DEFAULT_BACKGROUND = Options.getColor(
-            GlassPalette.BACKGROUND_KEY, GlassPalette.DEFAULT_BACKGROUND);
-
-    private final GlassPalette glassPalette;
+            "DEFAULT_BACKGROUND", new java.awt.Color(255, 255, 235));
 
     private JScrollPane jScrollPane1 = null;
 
@@ -426,28 +423,9 @@ public class IDEFPanel extends ViewPanel {
                         IDEFPanel.this.setActiveObject(activeObject);
                 }
             };
-            movingArea.setGlassPalette(glassPalette);
             movingArea.setBackground(DEFAULT_BACKGROUND);
         }
         return movingArea;
-    }
-
-    private void ensureGlassPaletteDefaults() {
-        ensureColorOption(GlassPalette.BACKGROUND_KEY,
-                GlassPalette.DEFAULT_BACKGROUND);
-        ensureColorOption(GlassPalette.HIGHLIGHT_KEY,
-                GlassPalette.DEFAULT_HIGHLIGHT);
-        ensureColorOption(GlassPalette.GRID_PRIMARY_KEY,
-                GlassPalette.DEFAULT_GRID_PRIMARY);
-        ensureColorOption(GlassPalette.GRID_SECONDARY_KEY,
-                GlassPalette.DEFAULT_GRID_SECONDARY);
-        ensureColorOption(GlassPalette.SPARKLE_KEY,
-                GlassPalette.DEFAULT_SPARKLE);
-    }
-
-    private void ensureColorOption(String key, Color fallback) {
-        Color color = Options.getColor(key, fallback);
-        Options.setColor(key, color);
     }
 
     protected void setActiveObject(Object activeObject) {
@@ -501,10 +479,6 @@ public class IDEFPanel extends ViewPanel {
         this.framework = framework;
         this.accessRules = accessRules;
         this.view = view;
-        ensureGlassPaletteDefaults();
-        glassPalette = GlassPalette.fromOptions();
-        DEFAULT_BACKGROUND = Options.getColor(GlassPalette.BACKGROUND_KEY,
-                GlassPalette.DEFAULT_BACKGROUND);
         this.findPanel.getJButton1().setVisible(false);
         this.findPanel.getJCheckBox().setVisible(false);
         this.findPanel.getJTextField().addFocusListener(new FocusAdapter() {
@@ -523,6 +497,8 @@ public class IDEFPanel extends ViewPanel {
         setMainFrame(frame);
         frame.addMChangeListener(changeListener1);
 
+        DEFAULT_BACKGROUND = Options.getColor("DEFAULT_BACKGROUND",
+                new java.awt.Color(255, 255, 210));
         initialize();
         setFocusable(true);
 

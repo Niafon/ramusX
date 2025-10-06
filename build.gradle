@@ -61,16 +61,26 @@ task copyDeps(type: Copy) {
 
 task copyFiles(dependsOn: [copyJars, copyDeps, moveStartup])
 
+def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+
 task windowsInstallerDocker(type:Exec, dependsOn: [copyFiles]) {
     workingDir './dest'
 
-    commandLine './build-installer', '--docker'
+    if (isWindows) {
+        commandLine 'powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'build-installer.ps1', '--docker'
+    } else {
+        commandLine './build-installer', '--docker'
+    }
 }
 
 task windowsInstaller(type:Exec, dependsOn: [copyFiles]) {
     workingDir './dest'
 
-    commandLine './build-installer'
+    if (isWindows) {
+        commandLine 'powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'build-installer.ps1'
+    } else {
+        commandLine './build-installer'
+    }
 }
 
 izpack {

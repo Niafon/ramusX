@@ -41,11 +41,6 @@ import com.ramussoft.gui.common.GUIFramework;
 import com.ramussoft.gui.common.GlobalResourcesManager;
 import com.ramussoft.gui.common.PrintPlugin;
 import com.ramussoft.gui.common.prefrence.Options;
-<<<<<<< ours
-import com.formdev.flatlaf.FlatClientProperties;
-=======
-import com.ramussoft.gui.common.icons.IconLoader;
->>>>>>> theirs
 
 public abstract class PrintPreviewComponent extends JComponent {
 
@@ -503,7 +498,8 @@ public abstract class PrintPreviewComponent extends JComponent {
             super(GlobalResourcesManager.getString("Action.Print"));
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/print.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/print.png")));
             putValue(ACTION_COMMAND_KEY, "Action.Print");
             putValue(SHORT_DESCRIPTION,
                     GlobalResourcesManager.getString("Action.Print"));
@@ -540,7 +536,8 @@ public abstract class PrintPreviewComponent extends JComponent {
             super(GlobalResourcesManager.getString("Action.PageSetup"));
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/page-setup.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/page-setup.png")));
             putValue(ACTION_COMMAND_KEY, "Action.PageSetup");
             putValue(SHORT_DESCRIPTION,
                     GlobalResourcesManager.getString("Action.PageSetup"));
@@ -567,7 +564,10 @@ public abstract class PrintPreviewComponent extends JComponent {
                     .getString("Action.PreviewColumnLayout"));
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/print/preview/previewLayoutCol.png"));
+                    new ImageIcon(
+                            getClass()
+                                    .getResource(
+                                            "/com/ramussoft/gui/print/preview/previewLayoutCol.png")));
             putValue(ACTION_COMMAND_KEY, "Action.PreviewColumnLayout");
             putValue(SHORT_DESCRIPTION,
                     GlobalResourcesManager
@@ -597,7 +597,10 @@ public abstract class PrintPreviewComponent extends JComponent {
             super(GlobalResourcesManager.getString("Action.PreviewGridLayout"));
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/print/preview/previewLayoutGrid.png"));
+                    new ImageIcon(
+                            getClass()
+                                    .getResource(
+                                            "/com/ramussoft/gui/print/preview/previewLayoutGrid.png")));
             putValue(ACTION_COMMAND_KEY, "Action.PreviewGridLayout");
             putValue(SHORT_DESCRIPTION,
                     GlobalResourcesManager
@@ -661,9 +664,6 @@ public abstract class PrintPreviewComponent extends JComponent {
 
     public Component createStatusBar() {
         JPanel panel = new JPanel(new FlowLayout());
-        panel.setOpaque(false);
-        panel.putClientProperty(FlatClientProperties.STYLE,
-                "background:null; borderWidth:0; focusWidth:0; innerFocusWidth:0;");
         pageOf = new JLabel(MessageFormat.format(
                 GlobalResourcesManager.getString("PageOf"), 1,
                 printable.getPageCount()));

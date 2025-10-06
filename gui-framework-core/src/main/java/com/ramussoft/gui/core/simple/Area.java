@@ -87,13 +87,11 @@ public class Area extends CloseableTabbedPane {
 
     public Area(String id) {
         this.id = id;
-        menu = new CloseableTabbedPane.GlassPopupMenu();
+        menu = new JPopupMenu();
 
         menu.add(closeTab);
         menu.add(closeOthers);
         menu.add(closeAll);
-
-        setSharedClosePopupMenu(menu);
 
         addChangeListener(new ChangeListener() {
 
@@ -124,6 +122,7 @@ public class Area extends CloseableTabbedPane {
             }
         });
         int i = getTabCount() - 1;
+        setTabComponentAt(i, new ButtonTabComponent(this, menu));
         closeOthers.setEnabled(getTabCount() > 1);
         return i;
     }

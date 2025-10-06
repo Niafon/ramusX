@@ -37,7 +37,6 @@ import com.ramussoft.gui.common.UniqueView;
 import com.ramussoft.gui.common.event.ActionChangeEvent;
 import com.ramussoft.gui.common.event.ActionChangeListener;
 import com.ramussoft.gui.qualifier.Commands;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class BranchView extends AbstractUniqueView implements UniqueView {
 
@@ -53,8 +52,10 @@ public class BranchView extends AbstractUniqueView implements UniqueView {
 
     private long actualBranch;
 
-/*	private ImageIcon branch = IconLoader.getIcon(getClass(), "/com/ramussoft/gui/branch-down.png");
-	private ImageIcon branchTree = IconLoader.getIcon(getClass(), "/com/ramussoft/gui/branch-down-right.png");*/
+/*	private ImageIcon branch = new ImageIcon(getClass().getResource(
+            "/com/ramussoft/gui/branch-down.png"));
+	private ImageIcon branchTree = new ImageIcon(getClass().getResource(
+			"/com/ramussoft/gui/branch-down-right.png"));*/
 
     public BranchView(GUIFramework framework) {
         super(framework);
@@ -191,7 +192,8 @@ public class BranchView extends AbstractUniqueView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "Action.AddBranchChild");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/branch-down.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/branch-down.png")));
             setEnabled(false);
         }
 
@@ -214,7 +216,8 @@ public class BranchView extends AbstractUniqueView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "Action.ActivateBranch");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/branch-actual.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/branch-actual.png")));
             setEnabled(false);
         }
 
@@ -241,7 +244,8 @@ public class BranchView extends AbstractUniqueView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "Action.EditBranchComment");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/edit-comment-branch.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/table/edit-comment-branch.png")));
             setEnabled(false);
         }
 

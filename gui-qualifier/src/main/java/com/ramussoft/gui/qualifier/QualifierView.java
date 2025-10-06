@@ -44,7 +44,6 @@ import com.ramussoft.gui.qualifier.table.RootCreater;
 import com.ramussoft.gui.qualifier.table.RowRootCreater;
 import com.ramussoft.gui.qualifier.table.TableView;
 import com.ramussoft.gui.qualifier.table.TreeTableNode;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class QualifierView extends TableView implements UniqueView {
 
@@ -104,7 +103,8 @@ public class QualifierView extends TableView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "Action.OpenQualifier");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/open.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/open.png")));
             this.putValue(
                     ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK
@@ -287,7 +287,8 @@ public class QualifierView extends TableView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "QualifierPreferencies");
             this.putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/preferencies.png"));
+                    new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/preferencies.png")));
             this.putValue(
                     ACCELERATOR_KEY,
                     KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK
@@ -441,7 +442,8 @@ public class QualifierView extends TableView implements UniqueView {
         ((AbstractTableModel) component.getTable().getModel())
                 .fireTableStructureChanged();
         component.getTable().setLeafIcon(
-                IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/qualifier.png"));
+                new ImageIcon(getClass().getResource(
+                        "/com/ramussoft/gui/table/qualifier.png")));
         getComponent().getRowSet().addRowChildListener(new RowChildAdapter() {
 
             @Override
@@ -467,7 +469,10 @@ public class QualifierView extends TableView implements UniqueView {
             putValue(ACTION_COMMAND_KEY, "Action.ConvertQualifierToElements");
             putValue(
                     SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/com/ramussoft/gui/table/qualifier-to-element.png"));
+                    new ImageIcon(
+                            getClass()
+                                    .getResource(
+                                            "/com/ramussoft/gui/table/qualifier-to-element.png")));
         }
 
         @Override

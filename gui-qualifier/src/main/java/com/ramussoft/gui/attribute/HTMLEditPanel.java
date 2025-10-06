@@ -54,7 +54,6 @@ import com.ramussoft.gui.spell.Language;
 import com.ramussoft.gui.spell.SpellFactory;
 
 import static com.ramussoft.gui.attribute.TextAttributePlugin.*;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class HTMLEditPanel extends JPanel implements AttributeEditor {
 
@@ -377,7 +376,8 @@ public class HTMLEditPanel extends JPanel implements AttributeEditor {
                 {
                     putValue(TOOL_TIP_TEXT_KEY, GlobalResourcesManager
                             .getString("HTMLEditor.OpenInEditor"));
-                    putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/open.png"));
+                    putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/open.png")));
                     putValue(ACTION_COMMAND_KEY, "HTMLEditor.OpenInEditor");
                 }
 
@@ -415,7 +415,8 @@ public class HTMLEditPanel extends JPanel implements AttributeEditor {
                 {
                     putValue(TOOL_TIP_TEXT_KEY, GlobalResourcesManager
                             .getString("HTMLEditor.Options"));
-                    putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/preferencies.png"));
+                    putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
+                            "/com/ramussoft/gui/preferencies.png")));
                     putValue(ACTION_COMMAND_KEY, "HTMLEditor.Options");
                 }
 

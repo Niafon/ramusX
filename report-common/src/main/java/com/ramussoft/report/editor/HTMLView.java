@@ -15,7 +15,6 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.SourceFormatter;
 
 import com.ramussoft.report.ReportResourceManager;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class HTMLView extends SubView {
 
@@ -43,7 +42,8 @@ public class HTMLView extends SubView {
 
         {
             putValue(ACTION_COMMAND_KEY, "Refresh");
-            putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/gui/refresh.png"));
+            putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
+                    "/com/ramussoft/gui/refresh.png")));
         }
 
         @Override
@@ -96,7 +96,8 @@ public class HTMLView extends SubView {
 
         public FormatAction() {
             putValue(ACTION_COMMAND_KEY, "Format.HTML");
-            putValue(SMALL_ICON, IconLoader.getIcon(getClass(), "/com/ramussoft/report/format.png"));
+            putValue(SMALL_ICON, new ImageIcon(getClass().getResource(
+                    "/com/ramussoft/report/format.png")));
             putValue(SELECTED_KEY, formatt);
         }
 

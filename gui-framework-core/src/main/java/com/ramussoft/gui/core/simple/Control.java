@@ -51,7 +51,6 @@ public class Control {
     }
 
     public void save(String layout) {
-        Options.setBoolean("layout." + layout + ".translucent", true);
         Options.saveOptions("layout." + layout, frame);
     }
 
@@ -149,11 +148,6 @@ public class Control {
 
         String name = "layout." + layout;
         Properties properties = Options.getProperties(name);
-
-        if (!Options.getBoolean(name + ".translucent", true)) {
-            Options.setBoolean(name + ".translucent", true);
-        }
-        contentArea.refreshGlassStyling();
 
         Options.loadOptions(name, frame, properties, false);
 

@@ -28,7 +28,6 @@ import com.ramussoft.gui.common.UniqueView;
 import com.ramussoft.gui.core.GUIPluginFactory;
 import com.ramussoft.gui.qualifier.table.TableView;
 import com.ramussoft.pb.DataPlugin;
-import com.ramussoft.gui.common.icons.IconLoader;
 
 public class RolesView extends AbstractUniqueView implements UniqueView {
 
@@ -74,12 +73,13 @@ public class RolesView extends AbstractUniqueView implements UniqueView {
     }
 
     private Action selectActiveRole = new AbstractAction(
-            getString("Owners.Clasificator"), IconLoader.getIcon(getClass(), "/images/roles.png")) {
+            getString("Owners.Clasificator"), new ImageIcon(getClass()
+            .getResource("/images/roles.png"))) {
 
         {
             putValue(SHORT_DESCRIPTION, getString("Owners.Clasificator"));
             putValue(SMALL_ICON,
-                    IconLoader.getIcon(getClass(), "/images/roles.png"));
+                    new ImageIcon(getClass().getResource("/images/roles.png")));
         }
 
         @Override
