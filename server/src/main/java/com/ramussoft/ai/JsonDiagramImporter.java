@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -91,7 +92,7 @@ public class JsonDiagramImporter {
             sector.setFunction(diagramFunction);
             sector.setCreateState(Sector.STATE_NONE, 0.5);
 
-            Stream stream = createStreamForArrow(arrow);
+            Stream stream = createStreamForArrow(arrow, state, true);
             sector.setStream(stream, ReplaceStreamType.CHILDREN);
             state.streams.put(arrowId, stream);
             state.streamLookup.put(arrowId, stream);
@@ -240,7 +241,8 @@ public class JsonDiagramImporter {
             long streamId = sectorNode.path("streamId").asLong(Long.MIN_VALUE);
             Stream stream = state.streamLookup.get(streamId);
             if (stream == null) {
-                stream = createStreamForArrow(arrow);
+                boolean allowMerge = streamId == Long.MIN_VALUE;
+                stream = createStreamForArrow(arrow, state, allowMerge);
                 if (streamId != Long.MIN_VALUE) {
                     state.streams.put(streamId, stream);
                     state.streamLookup.put(streamId, stream);
@@ -251,7 +253,7 @@ public class JsonDiagramImporter {
             }
             sector.setStream(stream, ReplaceStreamType.CHILDREN);
 
-            configureLegacyBorders(nSector, sectorNode, state);
+            configureLegacyBorders(nSector, arrow, sectorNode, state);
 
             state.sectors.put(arrowId, sector);
         }
@@ -340,11 +342,27 @@ public class JsonDiagramImporter {
         }
     }
 
-    private Stream createStreamForArrow(JsonNode arrow) {
-        Stream stream = (Stream) dataPlugin.createRow(dataPlugin.getBaseStream(), true);
+    private Stream createStreamForArrow(JsonNode arrow, ImportState state, boolean allowMerge) {
         String name = arrow.path("name").asText("");
+        boolean emptyName = arrow.path("emptyName").asBoolean(false);
+        boolean unnamed = emptyName || name == null || name.trim().isEmpty();
+
+        String normalized = null;
+        if (allowMerge && !unnamed) {
+            normalized = normalizeStreamName(name);
+            Stream existing = state.streamsByName.get(normalized);
+            if (existing != null) {
+                return existing;
+            }
+        }
+
+        Stream stream = (Stream) dataPlugin.createRow(dataPlugin.getBaseStream(), true);
         stream.setName(name);
-        stream.setEmptyName(name == null || name.isEmpty());
+        stream.setEmptyName(unnamed);
+
+        if (allowMerge && normalized != null) {
+            state.streamsByName.putIfAbsent(normalized, stream);
+        }
         return stream;
     }
 
@@ -353,18 +371,23 @@ public class JsonDiagramImporter {
         Attachment target = parseAttachment(arrow, "target", state.functionLookup, false);
 
         NSectorBorder start = sector.getStart();
-        applyAttachment(start, source);
+        Crosspoint crosspoint = resolveSharedCrosspoint(arrow, state);
+        applyAttachment(start, source, crosspoint);
 
         NSectorBorder end = sector.getEnd();
-        applyAttachment(end, target);
+        applyAttachment(end, target, crosspoint);
     }
 
-    private void configureLegacyBorders(NSector sector, JsonNode sectorNode, ImportState state) {
-        configureLegacyBorder(sector.getStart(), sectorNode.get("start"), state, true);
-        configureLegacyBorder(sector.getEnd(), sectorNode.get("end"), state, false);
+    private void configureLegacyBorders(NSector sector, JsonNode arrow, JsonNode sectorNode, ImportState state) {
+        JsonNode startNode = sectorNode.get("start");
+        JsonNode endNode = sectorNode.get("end");
+        boolean needShared = requiresSharedCrosspoint(startNode) || requiresSharedCrosspoint(endNode);
+        Crosspoint sharedCrosspoint = needShared ? resolveSharedCrosspoint(arrow, state) : null;
+        configureLegacyBorder(sector.getStart(), startNode, state, true, sharedCrosspoint);
+        configureLegacyBorder(sector.getEnd(), endNode, state, false, sharedCrosspoint);
     }
 
-    private void configureLegacyBorder(NSectorBorder border, JsonNode node, ImportState state, boolean source) {
+    private void configureLegacyBorder(NSectorBorder border, JsonNode node, ImportState state, boolean source, Crosspoint sharedCrosspoint) {
         if (node == null || !node.isObject()) {
             return;
         }
@@ -389,12 +412,20 @@ public class JsonDiagramImporter {
             border.setBorderTypeA(SectorBorder.TYPE_BORDER);
         }
 
+        Crosspoint crosspoint = null;
         if (node.has("crosspointId")) {
             long crosspointId = node.path("crosspointId").asLong(-1L);
             if (crosspointId >= 0) {
-                Crosspoint crosspoint = resolveCrosspoint(state, crosspointId);
-                border.setCrosspointA(crosspoint);
+                crosspoint = resolveCrosspoint(state, crosspointId);
             }
+        }
+
+        if (crosspoint == null) {
+            crosspoint = sharedCrosspoint;
+        }
+
+        if (crosspoint != null) {
+            border.setCrosspointA(crosspoint);
         }
 
         border.commit();
@@ -433,8 +464,8 @@ public class JsonDiagramImporter {
         }
     }
 
-    private void applyAttachment(NSectorBorder border, Attachment attachment) {
-        Crosspoint crosspoint = dataPlugin.createCrosspoint();
+    private void applyAttachment(NSectorBorder border, Attachment attachment, Crosspoint sharedCrosspoint) {
+        Crosspoint crosspoint = sharedCrosspoint != null ? sharedCrosspoint : dataPlugin.createCrosspoint();
         border.setCrosspointA(crosspoint);
         border.setFunctionTypeA(attachment.side);
         if (attachment.function != null) {
@@ -607,6 +638,43 @@ public class JsonDiagramImporter {
         return crosspoint;
     }
 
+    private Crosspoint resolveSharedCrosspoint(JsonNode arrow, ImportState state) {
+        String normalized = getNormalizedStreamName(arrow);
+        if (normalized == null) {
+            return null;
+        }
+        Crosspoint crosspoint = state.crosspointsByName.get(normalized);
+        if (crosspoint == null) {
+            crosspoint = dataPlugin.createCrosspoint();
+            state.crosspointsByName.put(normalized, crosspoint);
+        }
+        return crosspoint;
+    }
+
+    private String getNormalizedStreamName(JsonNode arrow) {
+        String name = arrow.path("name").asText("");
+        boolean emptyName = arrow.path("emptyName").asBoolean(false);
+        if (emptyName || name == null) {
+            return null;
+        }
+        String normalized = normalizeStreamName(name);
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private String normalizeStreamName(String name) {
+        return name == null ? "" : name.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private boolean requiresSharedCrosspoint(JsonNode node) {
+        if (node == null || !node.isObject()) {
+            return false;
+        }
+        if (!node.has("crosspointId")) {
+            return true;
+        }
+        return node.path("crosspointId").asLong(-1L) < 0;
+    }
+
     private byte[] decodeBase64(String value) {
         if (value == null || value.isEmpty()) {
             return new byte[0];
@@ -642,6 +710,8 @@ public class JsonDiagramImporter {
         private final Map<Long, Stream> streamLookup = new HashMap<>();
         private final Map<Long, Sector> sectors = new LinkedHashMap<>();
         private final Map<Long, Crosspoint> crosspoints = new HashMap<>();
+        private final Map<String, Stream> streamsByName = new HashMap<>();
+        private final Map<String, Crosspoint> crosspointsByName = new HashMap<>();
 
         private ImportState() {
             functionLookup.put(0L, rootFunction);

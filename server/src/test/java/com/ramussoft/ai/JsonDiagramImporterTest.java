@@ -214,4 +214,143 @@ public class JsonDiagramImporterTest {
         assertEquals(SectorBorder.TYPE_BORDER, end13.getBorderType());
         assertEquals(MovingPanel.RIGHT, end13.getFunctionType());
     }
+
+    @Test
+    public void reusesStreamAndCrosspointForSameNamedCompactArrows() throws Exception {
+        String json = "[" +
+                "{\"type\":\"box\",\"id\":1,\"name\":\"A1\",\"father\":0,\"x\":120,\"y\":80,\"width\":140,\"height\":90}," +
+                "{\"type\":\"box\",\"id\":2,\"name\":\"A2\",\"father\":0,\"x\":320,\"y\":80,\"width\":140,\"height\":90}," +
+                "{\"type\":\"box\",\"id\":3,\"name\":\"A3\",\"father\":0,\"x\":520,\"y\":80,\"width\":140,\"height\":90}," +
+                "{\"type\":\"arrow\",\"id\":10,\"name\":\"Shared\",\"father\":0,\"source\":1,\"sourceSide\":\"RIGHT\",\"target\":2,\"targetSide\":\"LEFT\"}," +
+                "{\"type\":\"arrow\",\"id\":11,\"name\":\"Shared\",\"father\":0,\"source\":1,\"sourceSide\":\"RIGHT\",\"target\":3,\"targetSide\":\"LEFT\"}" +
+                "]";
+
+        JsonDiagramImporter importer = new JsonDiagramImporter(dataPlugin, baseFunction);
+        JsonDiagramImporter.ImportResult result = importer.importDiagram(json);
+
+        Map<Long, Stream> streams = result.getStreams();
+        Stream stream10 = streams.get(10L);
+        Stream stream11 = streams.get(11L);
+        assertNotNull(stream10);
+        assertSame(stream10, stream11);
+
+        NSector sector10 = (NSector) result.getSectors().get(10L);
+        NSector sector11 = (NSector) result.getSectors().get(11L);
+        assertNotNull(sector10);
+        assertNotNull(sector11);
+
+        Crosspoint crosspoint10 = sector10.getStart().getCrosspoint();
+        assertNotNull(crosspoint10);
+        assertSame(crosspoint10, sector10.getEnd().getCrosspoint());
+        assertSame(crosspoint10, sector11.getStart().getCrosspoint());
+        assertSame(crosspoint10, sector11.getEnd().getCrosspoint());
+    }
+
+    @Test
+    public void reusesStreamsAcrossDiagramLevels() throws Exception {
+        String json = "[" +
+                "{\"type\":\"box\",\"id\":1,\"name\":\"A1\",\"father\":0,\"x\":120,\"y\":80,\"width\":140,\"height\":90}," +
+                "{\"type\":\"box\",\"id\":2,\"name\":\"A2\",\"father\":0,\"x\":320,\"y\":80,\"width\":140,\"height\":90}," +
+                "{\"type\":\"box\",\"id\":3,\"name\":\"A1.1\",\"father\":1,\"x\":140,\"y\":140,\"width\":120,\"height\":70}," +
+                "{\"type\":\"box\",\"id\":4,\"name\":\"A1.2\",\"father\":1,\"x\":320,\"y\":140,\"width\":120,\"height\":70}," +
+                "{\"type\":\"arrow\",\"id\":20,\"name\":\"Flow\",\"father\":0,\"source\":1,\"sourceSide\":\"RIGHT\",\"target\":2,\"targetSide\":\"LEFT\"}," +
+                "{\"type\":\"arrow\",\"id\":21,\"name\":\"Flow\",\"father\":1,\"source\":3,\"sourceSide\":\"RIGHT\",\"target\":4,\"targetSide\":\"LEFT\"}" +
+                "]";
+
+        JsonDiagramImporter importer = new JsonDiagramImporter(dataPlugin, baseFunction);
+        JsonDiagramImporter.ImportResult result = importer.importDiagram(json);
+
+        Map<Long, Stream> streams = result.getStreams();
+        Stream rootStream = streams.get(20L);
+        Stream nestedStream = streams.get(21L);
+        assertNotNull(rootStream);
+        assertSame(rootStream, nestedStream);
+
+        NSector rootSector = (NSector) result.getSectors().get(20L);
+        NSector nestedSector = (NSector) result.getSectors().get(21L);
+        assertNotNull(rootSector);
+        assertNotNull(nestedSector);
+
+        Crosspoint shared = rootSector.getStart().getCrosspoint();
+        assertNotNull(shared);
+        assertSame(shared, rootSector.getEnd().getCrosspoint());
+        assertSame(shared, nestedSector.getStart().getCrosspoint());
+        assertSame(shared, nestedSector.getEnd().getCrosspoint());
+    }
+
+    @Test
+    public void legacyWithoutCrosspointIdUsesSharedCrosspoint() throws Exception {
+        String json = "{" +
+                "\"elements\":[" +
+                "{\"type\":\"box\",\"id\":12,\"name\":\"A1\",\"parent\":{\"functionId\":0}}," +
+                "{\"type\":\"box\",\"id\":18,\"name\":\"A2\",\"parent\":{\"functionId\":0}}," +
+                "{\"type\":\"box\",\"id\":19,\"name\":\"A3\",\"parent\":{\"functionId\":0}}," +
+                "{\"type\":\"arrow\",\"id\":30,\"name\":\"LegacyFlow\",\"sector\":{" +
+                "\"functionId\":0," +
+                "\"start\":{\"functionId\":12,\"functionSide\":\"RIGHT\"}," +
+                "\"end\":{\"functionId\":18,\"functionSide\":\"LEFT\"}" +
+                "}}," +
+                "{\"type\":\"arrow\",\"id\":31,\"name\":\"LegacyFlow\",\"sector\":{" +
+                "\"functionId\":0," +
+                "\"start\":{\"functionId\":12,\"functionSide\":\"RIGHT\"}," +
+                "\"end\":{\"functionId\":19,\"functionSide\":\"LEFT\"}" +
+                "}}" +
+                "]}";
+
+        JsonDiagramImporter importer = new JsonDiagramImporter(dataPlugin, baseFunction);
+        JsonDiagramImporter.ImportResult result = importer.importDiagram(json);
+
+        Map<Long, Stream> streams = result.getStreams();
+        Stream stream30 = streams.get(30L);
+        Stream stream31 = streams.get(31L);
+        assertNotNull(stream30);
+        assertSame(stream30, stream31);
+
+        NSector sector30 = (NSector) result.getSectors().get(30L);
+        NSector sector31 = (NSector) result.getSectors().get(31L);
+        assertNotNull(sector30);
+        assertNotNull(sector31);
+
+        Crosspoint crosspoint = sector30.getStart().getCrosspoint();
+        assertNotNull(crosspoint);
+        assertSame(crosspoint, sector30.getEnd().getCrosspoint());
+        assertSame(crosspoint, sector31.getStart().getCrosspoint());
+        assertSame(crosspoint, sector31.getEnd().getCrosspoint());
+    }
+
+    @Test
+    public void legacyWithCrosspointIdRespectsExplicitValues() throws Exception {
+        String json = "{" +
+                "\"elements\":[" +
+                "{\"type\":\"box\",\"id\":12,\"name\":\"A1\",\"parent\":{\"functionId\":0}}," +
+                "{\"type\":\"box\",\"id\":18,\"name\":\"A2\",\"parent\":{\"functionId\":0}}," +
+                "{\"type\":\"box\",\"id\":19,\"name\":\"A3\",\"parent\":{\"functionId\":0}}," +
+                "{\"type\":\"arrow\",\"id\":40,\"name\":\"LegacyFlow\",\"sector\":{" +
+                "\"functionId\":0," +
+                "\"start\":{\"functionId\":12,\"functionSide\":\"RIGHT\",\"crosspointId\":501}," +
+                "\"end\":{\"functionId\":18,\"functionSide\":\"LEFT\",\"crosspointId\":501}" +
+                "}}," +
+                "{\"type\":\"arrow\",\"id\":41,\"name\":\"LegacyFlow\",\"sector\":{" +
+                "\"functionId\":0," +
+                "\"start\":{\"functionId\":12,\"functionSide\":\"RIGHT\",\"crosspointId\":502}," +
+                "\"end\":{\"functionId\":19,\"functionSide\":\"LEFT\",\"crosspointId\":502}" +
+                "}}" +
+                "]}";
+
+        JsonDiagramImporter importer = new JsonDiagramImporter(dataPlugin, baseFunction);
+        JsonDiagramImporter.ImportResult result = importer.importDiagram(json);
+
+        NSector sector40 = (NSector) result.getSectors().get(40L);
+        NSector sector41 = (NSector) result.getSectors().get(41L);
+        assertNotNull(sector40);
+        assertNotNull(sector41);
+
+        Crosspoint crosspoint40 = sector40.getStart().getCrosspoint();
+        Crosspoint crosspoint41 = sector41.getStart().getCrosspoint();
+        assertNotNull(crosspoint40);
+        assertNotNull(crosspoint41);
+        assertEquals(501L, crosspoint40.getGlobalId());
+        assertEquals(502L, crosspoint41.getGlobalId());
+        assertNotSame(crosspoint40, crosspoint41);
+    }
 }
